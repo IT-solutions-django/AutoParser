@@ -8,7 +8,6 @@ from .tasks import update_korea
 
 class StartParsingView(View): 
     def get(self, request): 
-        parse_korea()
         update_korea.delay() 
         return HttpResponse("Парсер запущен!", status=200)
 
