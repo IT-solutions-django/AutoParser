@@ -257,7 +257,7 @@ def check_model_manifacture(brand, id):
     except Exception as e:
             logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
 
-            brand_country = CountryModels.objects.create(country="Корея", brand=brand)
+            brand_country = CountryModels.objects.create(country="?", brand=brand)
             brand_country.save()
 
 
