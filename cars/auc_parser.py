@@ -414,7 +414,7 @@ def parse_korea():
                 car.is_active = False
                 car.save()
 
-    cars_count = 1000
+    cars_count = 150000
     pages = int(cars_count) / 250
     page = 0
     try:

@@ -1,12 +1,16 @@
 from django.shortcuts import render
 from django.views import View 
+from django.http import HttpResponse
 from .tasks import parse_korea
 from .models import CountryModels
+from .tasks import update_korea
 
 
 class StartParsingView(View): 
     def get(self, request): 
         parse_korea()
+        update_korea.delay() 
+        return HttpResponse("Парсер запущен!", status=200)
 
 
 class LoadMarksView(View): 
