@@ -178,7 +178,8 @@ def save_to_db(table, car, model, brand_country):
         else:
             engine_type = None
 
-        if not car.get('year'): 
+        if not car.get('YEAR'):
+            print('Года нет') 
             return
         
         car_obj, created = model.objects.get_or_create(
