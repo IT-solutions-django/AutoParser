@@ -180,6 +180,9 @@ def save_to_db(table, car, model, brand_country):
 
         print(engine)
         # print(model)
+
+        if not car.get('year'): 
+            return
         
         car_obj, created = model.objects.get_or_create(
                 auc_table = table,
