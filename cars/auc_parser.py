@@ -178,9 +178,6 @@ def save_to_db(table, car, model, brand_country):
         else:
             engine_type = None
 
-        print(engine)
-        # print(model)
-
         if not car.get('year'): 
             return
         
@@ -257,6 +254,10 @@ def check_model_manifacture(brand, id):
             return AucCarsEurope, brand_country
         elif brand_country.country == 'США':
             return AucCarsUSA, brand_country
+        brand_country = CountryModels.objects.create(country="?", brand=brand)
+        brand_country.save()
+        return AucCars, brand_country
+
     except Exception as e:
             logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
 
@@ -436,9 +437,7 @@ def parse_korea():
                     print(f'result = {result}')
                     car["AUCTION_DATE"] = datetime.now()
 
-
                     model, country = result
-
 
                     save_to_db(table, car, AucCars ,country)
                 except Exception as e:
@@ -456,6 +455,7 @@ def parse_korea():
                 car.delete() 
     except Exception as e:
             logging.error(f"Ошибка Корея: {e}")
+            print(str(e))
             return None
 
 
