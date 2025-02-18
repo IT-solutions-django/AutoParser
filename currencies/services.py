@@ -1,0 +1,87 @@
+import requests 
+from bs4 import BeautifulSoup as bs
+from .config import SETTINGS as ST
+from .models import Currency
+import re
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+
+def update_jpy() -> None: 
+    jpy = Currency.get_jpy()
+    exchange_rate = get_jpy_rate()
+    jpy.exchange_rate = exchange_rate
+    jpy.save()
+
+
+def update_cny() -> None: 
+    cny = Currency.get_cny() 
+    exchange_rate = get_cny_rate()
+    cny.exchange_rate = exchange_rate
+    cny.save()
+
+
+def update_krw() -> None: 
+    krw = Currency.get_krw() 
+    exchange_rate = get_krw_rate() 
+    krw.exchange_rate = exchange_rate 
+    krw.save()
+
+
+def get_jpy_rate() -> float:
+    jpy_url = ST.JPY_URL
+    response = requests.get(jpy_url)
+    try:
+        soup = bs(response.text, 'lxml')
+        jpy_rate = float(soup.find(attrs={'name': 'jpy2'})['value'])
+        return jpy_rate
+
+    except Exception as e:
+        print(f'Ошибка при парсинге JPY: {e}')
+        return 1
+    
+
+def get_cny_rate() -> float: 
+    cny_url = ST.CNY_URL 
+
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless") 
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+    try: 
+        driver.get(cny_url)
+        html = driver.page_source
+
+        elements = WebDriverWait(driver, 20).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'currency-rates-tablestyles__RowWrapper')]"))
+        )
+
+        last_element = elements[-1] if elements else None
+
+        if last_element: 
+            child_elements = last_element.find_elements(By.XPATH, "./*") 
+            third_child = child_elements[2]   
+            p_tag = third_child.find_element(By.TAG_NAME, "p")
+            cny_rate = p_tag.text if p_tag else 1
+            return float(cny_rate.replace(',', '.'))
+    except Exception as e: 
+        print(f'Ошибка при парсинге CNY: {e}')
+        return 1
+    
+
+def get_krw_rate() -> float: 
+    krw_url = ST.KRW_URL 
+    response = requests.get(krw_url)
+    try:
+        soup = bs(response.text, 'lxml')
+        krw_row = soup.find_all('div', class_='rates__item')[-2] 
+        exchange_rate = krw_row.find('p', class_='rates__sell').text
+        return float(exchange_rate)
+    except Exception as e:
+        print(f'Ошибка при парсинге KRW: {e}')
+        return 1

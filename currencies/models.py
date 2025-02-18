@@ -1,0 +1,47 @@
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+class Currency(models.Model):
+    class Meta:
+        verbose_name = "Валюта"
+        verbose_name_plural = "Валюты"
+
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=200,
+        choices = (
+            ("USD", "USD"),
+            ("EUR", "EUR"),
+            ("JPY", "JPY"),
+            ("CNY", "CNY"),
+            ("KRW", "KRW"),
+            ("JPY_crypto", "JPY_crypto"),
+            ("CNY_crypto", "CNY_crypto"),
+            ("KRW_crypto", "KRW_crypto"),
+        )
+    )
+
+    exchange_rate = models.FloatField(
+        default=0.0,
+        verbose_name=_("Курс"),
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return f'{self.name} {self.exchange_rate} {self.updated_at}'
+    
+    @staticmethod
+    def get_jpy() -> 'Currency': 
+        return Currency.objects.get(name='JPY')
+    
+    @staticmethod
+    def get_cny() -> 'Currency': 
+        return Currency.objects.get(name='CNY')
+    
+    @staticmethod
+    def get_krw() -> 'Currency': 
+        return Currency.objects.get(name='KRW')
