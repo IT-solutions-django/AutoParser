@@ -48,27 +48,20 @@ def get_jpy_rate() -> float:
 
 def get_cny_rate() -> float: 
     cny_url = ST.CNY_URL 
-
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless") 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "application/json"
+    }
+    response = requests.get(cny_url, headers=headers)
     try: 
-        driver.get(cny_url)
-        html = driver.page_source
-
-        elements = WebDriverWait(driver, 20).until(
-            EC.presence_of_all_elements_located((By.XPATH, "//*[contains(@class, 'currency-rates-tablestyles__RowWrapper')]"))
+        data = response.json() 
+        cny_rate = next(
+            (rate for rate in data["rates"] if rate["currency1"]["code"] == "CNY"),
+            None
         )
-
-        last_element = elements[-1] if elements else None
-
-        if last_element: 
-            child_elements = last_element.find_elements(By.XPATH, "./*") 
-            third_child = child_elements[2]   
-            p_tag = third_child.find_element(By.TAG_NAME, "p")
-            cny_rate = p_tag.text if p_tag else 1
-            return float(cny_rate.replace(',', '.'))
+        if cny_rate:
+            exchange_rate = float(cny_rate['offer']) 
+            return exchange_rate
     except Exception as e: 
         print(f'Ошибка при парсинге CNY: {e}')
         return 1
