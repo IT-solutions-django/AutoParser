@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.views import View 
 from django.http import HttpResponse
-from .tasks import parse_korea
 from .models import CountryModels
 from .tasks import update_korea
 
