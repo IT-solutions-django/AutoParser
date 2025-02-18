@@ -1,4 +1,3 @@
-from . import parse_china, parse_japan, parse_korea
 from celery import shared_task
 from .services import update_jpy, update_cny, update_krw
 
