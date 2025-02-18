@@ -1,6 +1,8 @@
 import os 
 from celery import Celery 
 from celery.schedules import crontab
+import cars.tasks  
+import currencies.tasks
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings') 
@@ -10,18 +12,18 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks() 
 
 app.conf.beat_schedule = {
-    'update_yen_daily': {
-        'task': 'cars.tasks.update_jpy',
+    'update_jpy_daily': {
+        'task': 'currencies.tasks.update_jpy',
         # 'schedule': crontab(hour=11, minute=0),  
         'schedule': 60,  
     },
-    'update_korea_daily': {
-        'task': 'cars.tasks.update_krw',
+    'update_krw_daily': {
+        'task': 'currencies.tasks.update_krw',
         # 'schedule': crontab(hour=11, minute=0),
         'schedule': 60,  
     },
-    'update_china_daily': {
-        'task': 'cars.tasks.update_cny',
+    'update_cny_daily': {
+        'task': 'currencies.tasks.update_cny',
         # 'schedule': crontab(hour=11, minute=0),
         'schedule': 60,  
     },
