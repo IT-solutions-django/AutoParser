@@ -73,8 +73,8 @@ def get_krw_rate() -> float:
     try:
         soup = bs(response.text, 'lxml')
         krw_row = soup.find_all('div', class_='rates__item')[-2] 
-        exchange_rate = krw_row.find('p', class_='rates__sell').text
-        return float(exchange_rate)
+        exchange_rate = krw_row.find('p', class_='rates__buy').text
+        return float(exchange_rate) / 1000
     except Exception as e:
         print(f'Ошибка при парсинге KRW: {e}')
         return 1
