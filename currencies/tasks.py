@@ -1,17 +1,17 @@
 from . import parse_china, parse_japan, parse_korea
 from celery import shared_task
-from .services import update_yen
+from .services import update_jpy, update_cny, update_krw
 
 
 @shared_task
-def update_yen():
-    update_yen()
+def update_jpy_task():
+    update_jpy()
 
 @shared_task
-def update_korea():
-    parse_korea()
+def update_cny_task():
+    update_cny()
 
 @shared_task
-def update_china():
-    parse_china()
+def update_krw_task():
+    update_krw()
 
