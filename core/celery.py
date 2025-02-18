@@ -9,9 +9,17 @@ app = Celery('core')
 app.config_from_object('django.conf:settings', namespace='CELERY') 
 app.autodiscover_tasks() 
 
-# app.conf.beat_schedule = {
-#     'update_telegram_chats': {
-#         'task': 'cars.tasks.update_korea',
-#         'schedule': crontab(hour=0, minute=0),  
-#     }
-# }
+app.conf.beat_schedule = {
+    'update_yen_daily': {
+        'task': 'cars.tasks.update_jpy',
+        'schedule': crontab(hour=0, minute=0),  
+    },
+    'update_korea_daily': {
+        'task': 'cars.tasks.update_krw',
+        'schedule': crontab(hour=0, minute=0),
+    },
+    'update_china_daily': {
+        'task': 'cars.tasks.update_cny',
+        'schedule': crontab(hour=0, minute=0),
+    },
+}
