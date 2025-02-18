@@ -18,17 +18,14 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'update_jpy_daily': {
         'task': 'currencies.tasks.update_jpy_task',
-        # 'schedule': crontab(hour=11, minute=0),  
-        'schedule': 30,  
+        'schedule': crontab(hour=11, minute=0),  
     },
     'update_krw_daily': {
         'task': 'currencies.tasks.update_krw_task',
-        # 'schedule': crontab(hour=11, minute=0),
-        'schedule': 30,  
+        'schedule': crontab(hour=11, minute=0),
     },
     'update_cny_daily': {
         'task': 'currencies.tasks.update_cny_task',
-        # 'schedule': crontab(hour=11, minute=0),
-        'schedule': 30,  
+        'schedule': crontab(hour=11, minute=0),
     },
 }
