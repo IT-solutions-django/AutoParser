@@ -1,17 +1,18 @@
-from .models import AucCars
+from .models import *
 import logging 
-from .sub_fun import calc_price
+from .sub_fun import calc_toll
 
 logger = logging.getLogger(__name__)
 
 
 def update_prices():
+    cars_models = [AucCarsKorea, AucCarsJapan, AucCarsChina, AucCarsEurope, AucCarsRest]
     try:
         logging.info('Обновили валюты!')
 
-        cars = AucCars.objects.all()
+        cars = AucCarsRest.objects.all()
         for car in cars:
-            car.price = int(calc_price(car.finish, car.year, car.engine_volume, car.auc_table)[0])
+            car.toll = int(calc_toll(car.finish, car.year, car.engine_volume, car.auc_table)[0])
             car.save()
 
         logging.info('Обновили авто')

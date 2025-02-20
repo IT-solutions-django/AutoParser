@@ -124,7 +124,8 @@ class AucCarsJapan(models.Model):
     year = models.IntegerField(verbose_name=_("Год"))
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
-    price = models.IntegerField(verbose_name=_("Цена в РФ"))
+    price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+    toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
@@ -159,7 +160,8 @@ class AucCarsChina(models.Model):
     year = models.IntegerField(verbose_name=_("Год"))
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
-    price = models.IntegerField(verbose_name=_("Цена в РФ"))
+    price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+    toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
@@ -193,7 +195,8 @@ class AucCarsKorea(models.Model):
     year = models.IntegerField(verbose_name=_("Год"))
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
-    price = models.IntegerField(verbose_name=_("Цена в РФ"))
+    price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+    toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
@@ -212,39 +215,40 @@ class AucCarsKorea(models.Model):
         return f"{self.brand} {self.model} {self.year}"
     
 
-class AucCars(models.Model):
-    class Meta:
-        verbose_name = _("Автомобили")
-        verbose_name_plural = _("Автомобили")
+# class AucCars(models.Model):
+#     class Meta:
+#         verbose_name = _("Автомобили")
+#         verbose_name_plural = _("Автомобили")
         
-    auc_table = models.CharField(verbose_name=_("Таблица во внешнем апи"), max_length=50) 
-    lot = models.CharField(verbose_name=_("Номер лота"), max_length=50) 
-    auc_name = models.CharField(verbose_name=_("Название аукциона"), max_length=50)    
-    auc_date = models.DateTimeField(verbose_name=_("Дата аукциона"))    
-    api_id = models.CharField(verbose_name=_("ID автомобиля"), max_length=50, unique=True)
-    brand_country = models.ForeignKey(CountryModels, verbose_name=_("Страна производитель"), null=True, blank=True, default=None, on_delete=models.CASCADE)
-    brand = models.CharField(verbose_name=_("Бренд"), max_length=50)
-    model = models.CharField(verbose_name=_("Модель"), max_length=50)
-    year = models.IntegerField(verbose_name=_("Год"))
-    mileage = models.IntegerField(verbose_name=_("Пробег"))
-    photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
-    price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
-    kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
-    transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
-    engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
-    drive = models.CharField(verbose_name=_("Тип привода"), max_length=50)
-    color = models.CharField(verbose_name=_("Цвет"), max_length=50)
-    rate = models.CharField(verbose_name=_("Рейтинг"), max_length=5)
-    finish = models.CharField(verbose_name=_("Цена в валюте экспортера"), max_length=50)
-    power_volume = models.CharField(verbose_name=_("Мощность двигателя"), max_length=30,null=True, blank=True)
-    parsing_date = models.DateField(verbose_name=_("Дата парсинга"), auto_now=True) 
-    rubber = models.CharField(verbose_name=_("Руль"), max_length=30,null=True, blank=True, choices=RUBBER_CHOICES, default='Левый руль') 
-    engine = models.CharField(verbose_name=_("Тип двигателя"), max_length=30,null=True, blank=True, choices=ENGINE_CHOICES, default='Бензин') 
-    is_active = models.BooleanField()   
+#     auc_table = models.CharField(verbose_name=_("Таблица во внешнем апи"), max_length=50) 
+#     lot = models.CharField(verbose_name=_("Номер лота"), max_length=50) 
+#     auc_name = models.CharField(verbose_name=_("Название аукциона"), max_length=50)    
+#     auc_date = models.DateTimeField(verbose_name=_("Дата аукциона"))    
+#     api_id = models.CharField(verbose_name=_("ID автомобиля"), max_length=50, unique=True)
+#     brand_country = models.ForeignKey(CountryModels, verbose_name=_("Страна производитель"), null=True, blank=True, default=None, on_delete=models.CASCADE)
+#     brand = models.CharField(verbose_name=_("Бренд"), max_length=50)
+#     model = models.CharField(verbose_name=_("Модель"), max_length=50)
+#     year = models.IntegerField(verbose_name=_("Год"))
+#     mileage = models.IntegerField(verbose_name=_("Пробег"))
+#     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
+#     price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+#     toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
+#     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
+#     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
+#     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
+#     drive = models.CharField(verbose_name=_("Тип привода"), max_length=50)
+#     color = models.CharField(verbose_name=_("Цвет"), max_length=50)
+#     rate = models.CharField(verbose_name=_("Рейтинг"), max_length=5)
+#     finish = models.CharField(verbose_name=_("Цена в валюте экспортера"), max_length=50)
+#     power_volume = models.CharField(verbose_name=_("Мощность двигателя"), max_length=30,null=True, blank=True)
+#     parsing_date = models.DateField(verbose_name=_("Дата парсинга"), auto_now=True) 
+#     rubber = models.CharField(verbose_name=_("Руль"), max_length=30,null=True, blank=True, choices=RUBBER_CHOICES, default='Левый руль') 
+#     engine = models.CharField(verbose_name=_("Тип двигателя"), max_length=30,null=True, blank=True, choices=ENGINE_CHOICES, default='Бензин') 
+#     is_active = models.BooleanField()   
 
 
-    def __str__(self):
-        return f"{self.brand} {self.model} {self.year}"
+#     def __str__(self):
+#         return f"{self.brand} {self.model} {self.year}"
     
 
 class AucCarsEurope(models.Model):
@@ -263,7 +267,8 @@ class AucCarsEurope(models.Model):
     year = models.IntegerField(verbose_name=_("Год"))
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
-    price = models.IntegerField(verbose_name=_("Цена в РФ"))
+    price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+    toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
@@ -281,10 +286,10 @@ class AucCarsEurope(models.Model):
     def __str__(self):
         return f"{self.brand} {self.model} {self.year}"
     
-class AucCarsUSA(models.Model):
+class AucCarsRest(models.Model):
     class Meta:
-        verbose_name = _("Автомобили США")
-        verbose_name_plural = _("Автомобили США")
+        verbose_name = _("Автомобили (другое)")
+        verbose_name_plural = _("Автомобили (другое)")
         
     auc_table = models.CharField(verbose_name=_("Таблица во внешнем апи"), max_length=50) 
     lot = models.CharField(verbose_name=_("Номер лота"), max_length=50) 
@@ -298,6 +303,7 @@ class AucCarsUSA(models.Model):
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
     price = models.IntegerField(verbose_name=_("Цена в РФ"), null=True, blank=True)
+    toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
     commission = models.IntegerField(verbose_name=_("Комиссия"), null=True, blank=True)
     kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)

@@ -33,6 +33,18 @@ def update_krw() -> None:
     krw.save()
 
 
+def update_eur_and_usd() -> None: 
+    eur = Currency.get_eur() 
+    usd = Currency.get_usd() 
+
+    eur_exchange_rate, usd_exchange_rate = get_eur_and_usd_rate() 
+    eur.exchange_rate = eur_exchange_rate
+    usd.exchange_rate = usd_exchange_rate 
+
+    eur.save()
+    usd.save()
+
+
 def get_jpy_rate() -> float:
     jpy_url = ST.JPY_URL
     response = requests.get(jpy_url)
@@ -78,3 +90,16 @@ def get_krw_rate() -> float:
     except Exception as e:
         print(f'Ошибка при парсинге KRW: {e}')
         return 1
+    
+
+def get_eur_and_usd_rate() -> tuple[float, float]: 
+    eur_url = ST.EUR_URL 
+    response = requests.get(eur_url)
+    data = response.json() 
+    try: 
+        eur_exchange_rate = data['eur'] 
+        usd_exchange_rate = data['usd']
+        return eur_exchange_rate, usd_exchange_rate
+    except Exception as e:
+        print(f'Ошибка при парсинге EUR и ESD: {e}') 
+        return 1, 1

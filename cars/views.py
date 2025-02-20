@@ -1,25 +1,59 @@
 from django.shortcuts import render
-from django.views import View 
+from django.views import View
 from django.http import HttpResponse
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import CountryModels
-from .tasks import update_korea
+from .tasks import update_korea 
+from .auc_parser import parse_korea
+from rest_framework import generics
+from itertools import chain
+from .models import AucCarsJapan, AucCarsChina, AucCarsKorea
+from .serializers import AucCarsSerializer
+from .filters import AucCarsFilter
+from .auc_parser import *
+
+
 
 
 class StartParsingView(View): 
     def get(self, request): 
-        update_korea.delay() 
-        # update_korea()
-        return HttpResponse("Парсер запущен!", status=200)
+        # update_korea.delay()
+        print('Парсер запущен! (только для тестов!)')
+        parse_korea()
+        return HttpResponse("Парсер запущен! (только для тестов!)", status=200)
+    
 
-
-class LoadMarksView(View): 
+class FetchTestData(View): 
     def get(self, request): 
-        CAR_BRANDS = [
-            ("Корея", ["SAMSUNG", "SSANGYONG", "GENESIS", "HUASONG", "HYUNDAI", "KIA"]),
-            ("Япония", ["TOYOTA", "NISSAN", "SUZUKI", "MITSUBISHI", "SUBARU", "HONDA", "DAIHATSU", "LEXUS", "ISUZU", "MAZDA", "INFINITI", "ACURA", "SCION", "HINO"]),
-            ("Китай", ["BAIC", "BAO JUN", "BESTURN", "BYD", "CHANGAN", "CHERY", "CIIMO", "DEEPAL", "DENZA", "DONGFENG", "EXEED", "FOTON", "GEELY AUTO", "GEOMETRY", "GREAT WALL", "HAMA", "HAVAL", "HIPHI", "HONGQI", "HYCAN", "IM", "JAC", "JETOUR", "JETTA", "JMC", "LANTU", "LEAPMOTOR", "LEOPAARD", "LI AUTO", "MAXUS", "NETA AUTO", "NIO", "ORA", "QOROS", "RISING AUTO", "REWE", "RUICHI", "SGMW", "SOL", "SOUEAST", "SWM", "TANK", "TRUMPCHI", "VENUCIA", "WELTMEISTER", "WEVAN", "WEY", "XPENG MOTORS", "ZEEKR", "ZHONGHUA", "ZOTYE", "ZXAUTO", "LUMMA", "OLEY", "KAWEI", "SALEEN", "LINDWIND"]),
-            ("Европа", ["MERCEDES BENZ", "BMW", "MINI", "VOLKSWAGEN", "AUDI", "CITROEN", "VOLVO", "SMART", "PORSCHE", "LAND ROVER", "RENAULT", "ALFAROMEO", "FIAT", "ASTON MARTIN", "JAGUAR", "MG", "PEUGEOT", "MASERATI", "LANCIA", "SAAB", "FERRARI", "ROVER", "BMW ALPINA", "LOTUS", "BENTLEY", "LINCOLN", "TADANO", "TRIUMPH", "BORGWARD", "BRABUS", "BUICK", "CARLSSON", "DS", "HORKI", "KOENIGSEGG", "LAMBORGHINI", "LEVC", "LUXGEN", "LYNK", "MANSORY", "MAYBACH", "MCLAREN", "MORGAN", "POLESTAR", "ROLLS ROYCE", "SEAT", "SKODA", "STARTECH", "IVECO", "ALPINA"]),
-        ]
-        for country, brands in CAR_BRANDS:
-            for brand in brands:
-                CountryModels.objects.get_or_create(country=country, brand=brand)
+        sql_query = 'select+*+from+korea+WHERE+1+=+1+limit+1,10'
+        user_ip = get_client_ip()
+        try:
+            url = f"http://78.46.90.228/api/?ip={user_ip}&code=TDAjhTr53Sd9&sql={sql_query}"
+            print(url)
+            res = requests.get(url)
+            soup = BeautifulSoup(res.content.decode("utf-8"), "xml")
+            print()
+            data = [
+                {elem.name: elem.getText() for elem in row.findChildren()}
+                for row in soup.findAll("row")
+            ]
+            print(data)
+            return data
+        except Exception as e:
+            print(f'Ошибка: {e}')
+
+
+class AucCarsListView(generics.ListAPIView):
+    serializer_class = AucCarsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AucCarsFilter
+
+    def get_queryset(self):
+        japan_cars = AucCarsJapan.objects.all()
+        china_cars = AucCarsChina.objects.all()
+        korea_cars = AucCarsKorea.objects.all()
+
+        queryset = list(chain(japan_cars, china_cars, korea_cars))
+
+        return queryset

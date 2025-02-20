@@ -43,7 +43,7 @@ class EngineAdmin(admin.ModelAdmin):
     pass
    
    
-@admin.register(AucCars)
-class AucCars(admin.ModelAdmin):
+@admin.register(AucCarsRest)
+class AucCarsRestAdmin(admin.ModelAdmin):
     pass
 
