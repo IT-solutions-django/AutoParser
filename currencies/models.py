@@ -36,12 +36,20 @@ class Currency(models.Model):
     
     @staticmethod
     def get_jpy() -> 'Currency': 
-        return Currency.objects.get(name='JPY')
+        return Currency.objects.filter(name='JPY').first()
     
     @staticmethod
     def get_cny() -> 'Currency': 
-        return Currency.objects.get(name='CNY')
+        return Currency.objects.filter(name='CNY').first()
     
     @staticmethod
     def get_krw() -> 'Currency': 
-        return Currency.objects.get(name='KRW')
+        return Currency.objects.filter(name='KRW').first()
+    
+    @staticmethod
+    def get_usd() -> 'Currency': 
+        return Currency.objects.filter(name='USD').first()
+    
+    @staticmethod
+    def get_eur() -> 'Currency': 
+        return Currency.objects.filter(name='EUR').first()

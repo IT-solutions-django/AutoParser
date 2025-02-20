@@ -4,6 +4,7 @@ from .services import (
     update_jpy, 
     update_cny,
     update_krw,
+    update_eur_and_usd,
 )
 from django.http import HttpResponse, JsonResponse
 from .models import Currency
@@ -27,11 +28,19 @@ class UpdateKrwView(View):
         return HttpResponse('Курс воны обновлён')
     
 
+class UpdateEurAndUsdView(View): 
+    def get(self, request): 
+        update_eur_and_usd() 
+        return HttpResponse('Курс евро и доллара обновлён')
+    
+
 class GetExchangeRatesView(View): 
     def get(self, request): 
         jpy = Currency.get_jpy() 
         cny = Currency.get_cny() 
         krw = Currency.get_krw()
+        eur = Currency.get_eur()
+        usd = Currency.get_usd()
         data = {
             'JPY': {
                 'exchange_rate': jpy.exchange_rate, 
@@ -45,5 +54,13 @@ class GetExchangeRatesView(View):
                 'exchange_rate': krw.exchange_rate, 
                 'updated_at': krw.updated_at,
             },
+            'EUR': {
+                'exchange_rate': eur.exchange_rate, 
+                'updated_at': eur.updated_at,
+            }, 
+            'USD': {
+                'exchange_rate': usd.exchange_rate, 
+                'updated_at': usd.updated_at,
+            }
         }
         return JsonResponse(data)

@@ -7,7 +7,7 @@ from .models import Color
 from random import randint
 import time
 import logging
-import re
+from .sub_fun import calc_toll
 
 # Настройка логирования
 logging.basicConfig(
@@ -182,6 +182,9 @@ def save_to_db(table, car, model, brand_country):
             print('Года нет') 
             return
         
+        toll = calc_toll(car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type) 
+        print(toll)
+        
         car_obj, created = model.objects.get_or_create(
                 auc_table = table,
                 auc_name = car["AUCTION"],    
@@ -198,6 +201,7 @@ def save_to_db(table, car, model, brand_country):
                 #         car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type
                 #     )[0]
                 # ),
+                toll = toll,
                 transmission="Механика" if car["KPP_TYPE"] == '1' else "Автомат",
                 engine_volume = car["ENG_V"],
                 drive=(
@@ -253,11 +257,9 @@ def check_model_manifacture(brand, id):
             return AucCarsChina, brand_country
         elif brand_country.country == 'Европа':
             return AucCarsEurope, brand_country
-        elif brand_country.country == 'США':
-            return AucCarsUSA, brand_country
         brand_country = CountryModels.objects.create(country="?", brand=brand)
         brand_country.save()
-        return AucCars, brand_country
+        return AucCarsRest, brand_country
 
     except Exception as e:
             logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
@@ -265,8 +267,7 @@ def check_model_manifacture(brand, id):
             brand_country = CountryModels.objects.create(country="?", brand=brand)
             brand_country.save()
 
-
-            return AucCars, brand_country
+            return AucCarsRest, brand_country
             
 cars_models = [AucCarsKorea, AucCarsJapan, AucCarsChina, AucCarsEurope]
 def delete_dublicate():
@@ -314,103 +315,6 @@ def change_rubber():
             print(e)
 
 
-
-def parse_japan():
-    # отчистка невалидных данных
-    table = 'stats'
-    for model_c in cars_models:
-        last_date = (datetime.today().date() - timedelta(days=int(31)))
-        cars = model_c.objects.filter(auc_date__lt=last_date, auc_table=table).order_by('auc_date')
-        for car in cars:
-            car.delete()
-        
-    
-    # filters = get_base_filters(table)
-    # cars_count = get_cars_count(table, filters)
-    cars_count = 1000
-    pages = int(cars_count) / 250
-    page = 0
-    try:
-        while (page <= pages):
-            query = get_simple_sql_query(
-                "*", 
-                table, 
-                f"250,1",
-            )
-            # query = get_sql_query(
-            #     "*",
-            #     table,
-            #     filters,
-            #     f"{250 * page},{(250 * page) + 250 }",
-            # )
-            data = fetch_by_query(query)
-
-            print(data)
-
-            for car in data:
-                try:
-                    print(car)
-                    model, country = check_model_manifacture(car["MARKA_NAME"], car["ID"])
-                    save_to_db(table, car, AucCars, country)
-                except Exception as e:
-                    logging.error(f"Ошибка при обработке автомобиля с ID {car['ID']}: {e}")
-                    continue  
-
-            page += 1
-
-            print(f'Страница {page}')
-
-            time.sleep(randint(20, 30)) 
-    except Exception as e:
-        logging.error(f"Ошибка Япония: {e}")
-        return None
-
-def parse_china():
-    table = 'china'
-    for model_c in cars_models:
-            objects = model_c.objects.filter(auc_table=table)
-            for car in objects:
-                car.is_active = False
-                car.save()
-    
-    filters = get_base_filters(table)
-    cars_count = get_cars_count(table, filters)
-    pages = int(cars_count) / 250
-    page = 0
-    try:
-        while (page <= pages):
-            query = get_sql_query(
-                "*",
-                table,
-                filters,
-                f"{250 * page},{(250 * page) + 250 }",
-            )
-            data = fetch_by_query(query)
-
-            for car in data:
-                try:
-                    result = check_model_manifacture(car["MARKA_NAME"], car["ID"])
-                    car["AUCTION_DATE"] = datetime.now()
-                    model, country = result
-                    save_to_db(table, car, model,country)
-                except Exception as e:
-                    logging.error(f"Ошибка при обработке автомобиля с ID {car['ID']}: {e}")
-                    continue  
-            page += 1
-            
-
-            delay = randint(20, 30)
-            logging.info(f"Задержка: {delay} секунд между запросами.")
-            time.sleep(delay)
-        
-        for model_c in cars_models:
-            objects = model_c.objects.filter(auc_table=table, is_active=False)
-            for car in objects:
-                car.delete()
-    except Exception as e:
-            logging.error(f"Ошибка Китай: {e}")
-            return None
-
 def parse_korea():
     table = 'korea'
     for model_c in cars_models:
@@ -430,6 +334,7 @@ def parse_korea():
                 f"{250 * page},{(250 * page) + 250 }",
             )
             data = fetch_by_query(query)
+            print('сделали запрос')
 
             for car in data:
                 try:
@@ -440,7 +345,7 @@ def parse_korea():
 
                     model, country = result
 
-                    save_to_db(table, car, AucCars ,country)
+                    save_to_db(table, car, model, country)
                 except Exception as e:
                     print(str(e))
                     logging.error(f"Ошибка при обработке автомобиля с ID {car['ID']}: {e}")
@@ -448,7 +353,8 @@ def parse_korea():
             page += 1
             
 
-            time.sleep(randint(20, 30))
+            time.sleep(randint(40, 60))
+            print(f'Страница {page} позади')
 
         for model_c in cars_models:
             objects = model_c.objects.filter(auc_table=table, is_active=False)
@@ -499,4 +405,4 @@ def change_engine_type():
 
 
 def clean_USA():
-    AucCarsUSA.objects.all().delete()
+    AucCarsRest.objects.all().delete()

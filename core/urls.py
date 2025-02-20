@@ -23,9 +23,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('start/parsing/', StartParsingView.as_view(), name='start_parsing'), 
-    path('fff/', LoadMarksView.as_view()), 
+    path('start-parsing/', StartParsingView.as_view(), name='start_parsing'), 
 
+    path('cars/', include('cars.urls', namespace='cars')),
     path('currencies/', include('currencies.urls', namespace='currencies')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

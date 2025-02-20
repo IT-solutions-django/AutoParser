@@ -18,14 +18,15 @@ def get_curr_and_commissiom(table: str, crypto: bool=False):
         currency['USD'] = float(Currency.objects.get(name='USD').exchange_rate)
         currency['EUR'] = float(Currency.objects.get(name='EUR').exchange_rate)
         currency['KRW'] = float(Currency.objects.get(name='KRW_crypto').exchange_rate)
+        pass
     else:
-        currency['JPY'] = float(Currency.objects.get(name='JPY').exchange_rate)
-        currency['CNY'] = float(Currency.objects.get(name='CNY').exchange_rate)
-        currency['USD'] = float(Currency.objects.get(name='USD').exchange_rate)
-        currency['EUR'] = float(Currency.objects.get(name='EUR').exchange_rate)
-        currency['KRW'] = float(Currency.objects.get(name='KRW').exchange_rate)
+        currency['JPY'] = float(Currency.get_jpy().exchange_rate)
+        currency['CNY'] = float(Currency.get_cny().exchange_rate)
+        currency['USD'] = float(Currency.get_usd().exchange_rate)
+        currency['EUR'] = float(Currency.get_eur().exchange_rate)
+        currency['KRW'] = float(Currency.get_krw().exchange_rate)
 
-    commission = Commission.objects.get(table__name=table)
+    commission = Commission.objects.get(table=table)
 
     delivery = commission.delivery
     our_commision = commission.commission
@@ -43,11 +44,10 @@ def get_curr_and_commissiom(table: str, crypto: bool=False):
     return currency, delivery, our_commision, broker, commision_sanctions, delivery_sanctions, insurance
 
 
-def calc_price(price: int, year: int, volume: int, table: str, engine_type: str = None, crypto: bool = False):
+def calc_toll(price: int, year: int, volume: int, table: str, engine_type: str = None, crypto: bool = False):
     try:
         currency, delivery, our_commision, broker, commision_sanctions, delivery_sanctions, insurance = get_curr_and_commissiom(table, crypto)
             
-
         price = float(price)
         volume = int(volume)
         year = int(year)
@@ -181,16 +181,18 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
             else:
                 duty = volume * 5.7
 
-
-
         if engine_type == 2:
             toll = price_rus * 0.15 + tof + yts
         else:
             toll = duty * currency["EUR"] + tof + yts
 
+        print(toll)
+
         res_rus = toll  + (delivery*one_rub) + our_commision + broker + insurance_rus
 
-        return round((res_rus + price_rus) / 1000) * 1000, toll, yts, tof, price_rus, insurance, insurance_rus, delivery, delivery*one_rub, commision_sanctions_, commision_sanctions_*one_rub
+        return round(toll)
+
+        # return round((res_rus + price_rus) / 1000) * 1000, toll, yts, tof, price_rus, insurance, insurance_rus, delivery, delivery*one_rub, commision_sanctions_, commision_sanctions_*one_rub
     except Exception as e:
         print(e)
 

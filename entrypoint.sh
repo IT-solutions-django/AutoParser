@@ -14,6 +14,6 @@ python manage.py collectstatic --noinput
 celery -A core worker -l info -P prefork &
 celery -A core beat -l info &
 celery -A core flower -l info &
-gunicorn core.wsgi:application --bind 0.0.0.0:8000 &
+gunicorn core.wsgi:application --bind 0.0.0.0:8000 --timeout 300 &
 
 wait
