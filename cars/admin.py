@@ -19,31 +19,13 @@ class ColorMainAdmin(admin.ModelAdmin):
 class CountryModelsAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(AucCarsJapan)
-class AucCarsJapanAdmin(admin.ModelAdmin):
-    pass
-   
-@admin.register(AucCarsChina)
-class AucCarsChinaAdmin(admin.ModelAdmin):
-    pass
-   
-
-@admin.register(AucCarsKorea)
-class AucCarsKoreaAdmin(admin.ModelAdmin):
-    pass
-   
-
-@admin.register(AucCarsEurope)
-class AucCarsEuropeAdmin(admin.ModelAdmin):
-    pass
-
 
 @admin.register(Engine)
 class EngineAdmin(admin.ModelAdmin):
     pass
    
    
-@admin.register(AucCarsRest)
-class AucCarsRestAdmin(admin.ModelAdmin):
+@admin.register(AucCars)
+class AucCarsAdmin(admin.ModelAdmin):
     pass
 

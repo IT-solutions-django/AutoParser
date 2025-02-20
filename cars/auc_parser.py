@@ -187,8 +187,7 @@ def save_to_db(table, car, model, brand_country):
         
         car_obj, created = model.objects.get_or_create(
                 auc_table = table,
-                auc_name = car["AUCTION"],    
-                auc_date = car["AUCTION_DATE"],    
+                auc_name = car["AUCTION"],       
                 api_id = car["ID"],
                 brand = car["MARKA_NAME"],
                 model = car["MODEL_NAME"],
@@ -196,11 +195,6 @@ def save_to_db(table, car, model, brand_country):
                 year = int(car["YEAR"]),
                 kuzov = car["KUZOV"],
                 mileage = int(car["MILEAGE"]),
-                # price = int(
-                #     calc_price(
-                #         car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type
-                #     )[0]
-                # ),
                 toll = toll,
                 transmission="Механика" if car["KPP_TYPE"] == '1' else "Автомат",
                 engine_volume = car["ENG_V"],
@@ -217,6 +211,12 @@ def save_to_db(table, car, model, brand_country):
                 lot=car["LOT"],
                 rubber='Правый руль' if table == 'stats' else 'Левый руль',
                 engine = engine_type_name,
+                month=car["MONTH"],
+                grade=car["GRADE"],
+                kpp=car["KPP"],
+                equip=car["EQUIP"],
+                status=car["STATUS"],
+                time=car["TIME"],
         )
         print(f'Объект машины: {car_obj}')
 
@@ -248,18 +248,7 @@ def check_model_manifacture(brand, id):
         else:
             brand_country =  CountryModels.objects.get(brand=brand)
                 
-        # Определяем модель в зависимости от страны бренда
-        if brand_country.country == 'Япония':
-            return AucCarsJapan, brand_country
-        elif brand_country.country == 'Корея':
-            return AucCarsKorea, brand_country
-        elif brand_country.country == 'Китай':
-            return AucCarsChina, brand_country
-        elif brand_country.country == 'Европа':
-            return AucCarsEurope, brand_country
-        brand_country = CountryModels.objects.create(country="?", brand=brand)
-        brand_country.save()
-        return AucCarsRest, brand_country
+        return AucCars, brand_country
 
     except Exception as e:
             logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
@@ -267,9 +256,9 @@ def check_model_manifacture(brand, id):
             brand_country = CountryModels.objects.create(country="?", brand=brand)
             brand_country.save()
 
-            return AucCarsRest, brand_country
+            return AucCars, brand_country
             
-cars_models = [AucCarsKorea, AucCarsJapan, AucCarsChina, AucCarsEurope]
+cars_models = [..., ..., ..., ...]
 def delete_dublicate():
     for model_c in cars_models:
         cars = model_c.objects.all()
@@ -317,11 +306,10 @@ def change_rubber():
 
 def parse_korea():
     table = 'korea'
-    for model_c in cars_models:
-            objects = model_c.objects.filter(auc_table=table)
-            for car in objects:
-                car.is_active = False
-                car.save()
+    objects = AucCars.objects.filter(auc_table=table)
+    for car in objects:
+        car.is_active = False
+        car.save()
 
     cars_count = 150000
     pages = int(cars_count) / 250
@@ -345,7 +333,7 @@ def parse_korea():
 
                     model, country = result
 
-                    save_to_db(table, car, model, country)
+                    save_to_db(table, car, AucCars, country)
                 except Exception as e:
                     print(str(e))
                     logging.error(f"Ошибка при обработке автомобиля с ID {car['ID']}: {e}")

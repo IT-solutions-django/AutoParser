@@ -8,9 +8,7 @@ from .tasks import update_korea
 from .auc_parser import parse_korea
 from rest_framework import generics
 from itertools import chain
-from .models import AucCarsJapan, AucCarsChina, AucCarsKorea
-from .serializers import AucCarsSerializer
-from .filters import AucCarsFilter
+from .models import AucCars
 from .auc_parser import *
 
 
@@ -18,10 +16,10 @@ from .auc_parser import *
 
 class StartParsingView(View): 
     def get(self, request): 
-        # update_korea.delay()
+        update_korea.delay()
         print('Парсер запущен! (только для тестов!)')
-        parse_korea()
-        return HttpResponse("Парсер запущен! (только для тестов!)", status=200)
+        # parse_korea()
+        return HttpResponse("Парсер запущен!", status=200)
     
 
 class FetchTestData(View): 
@@ -43,17 +41,3 @@ class FetchTestData(View):
         except Exception as e:
             print(f'Ошибка: {e}')
 
-
-class AucCarsListView(generics.ListAPIView):
-    serializer_class = AucCarsSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = AucCarsFilter
-
-    def get_queryset(self):
-        japan_cars = AucCarsJapan.objects.all()
-        china_cars = AucCarsChina.objects.all()
-        korea_cars = AucCarsKorea.objects.all()
-
-        queryset = list(chain(japan_cars, china_cars, korea_cars))
-
-        return queryset
