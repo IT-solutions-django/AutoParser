@@ -136,8 +136,8 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
+# Для локальной разработки
+# REDIS_HOST = 'localhost'  
 
 REDIS_HOST = 'redis'  
 

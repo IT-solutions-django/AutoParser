@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import CountryModels
@@ -10,6 +10,7 @@ from rest_framework import generics
 from itertools import chain
 from .models import AucCars
 from .auc_parser import *
+from .services import parse_kcar
 
 
 
@@ -17,29 +18,8 @@ from .auc_parser import *
 class StartParsingView(View): 
     def get(self, request): 
         update_korea.delay()
-        print('Парсер запущен! (только для тестов!)')
-        # parse_korea()
+        # update_korea()
         return HttpResponse("Парсер запущен!", status=200)
-    
-
-class FetchTestData(View): 
-    def get(self, request): 
-        sql_query = 'select+*+from+korea+WHERE+1+=+1+limit+1,10'
-        user_ip = get_client_ip()
-        try:
-            url = f"http://78.46.90.228/api/?ip={user_ip}&code=TDAjhTr53Sd9&sql={sql_query}"
-            print(url)
-            res = requests.get(url)
-            soup = BeautifulSoup(res.content.decode("utf-8"), "xml")
-            print()
-            data = [
-                {elem.name: elem.getText() for elem in row.findChildren()}
-                for row in soup.findAll("row")
-            ]
-            print(data)
-            return data
-        except Exception as e:
-            print(f'Ошибка: {e}')
 
 
 class LoadMarksView(View): 
@@ -58,3 +38,9 @@ class LoadMarksView(View):
 class DeleteMarksView(View): 
     def get(self, request): 
         CountryModels.objects.all().delete()
+
+
+class ParseKcarView(View): 
+    def get(self, request): 
+        parse_kcar() 
+        return HttpResponse('Парсинг kcar.com')

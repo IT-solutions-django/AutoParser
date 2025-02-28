@@ -7,10 +7,7 @@ from core.settings import CELERY_BROKER_URL
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings') 
 
 app = Celery(
-    'core', 
-    # broker=CELERY_BROKER_URL, 
-    # backend=CELERY_BROKER_URL,
-    # include=['currencies.tasks']
+    'core'
 ) 
 app.config_from_object('django.conf:settings', namespace='CELERY') 
 app.autodiscover_tasks() 
