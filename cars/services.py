@@ -1,20 +1,24 @@
 from .models import *
 import logging 
+import requests
 from .sub_fun import calc_toll
+import json
+from .config import SITE_URLS
 
 logger = logging.getLogger(__name__)
 
 
-def update_prices():
-    cars_models = [AucCarsKorea, AucCarsJapan, AucCarsChina, AucCarsEurope, AucCarsRest]
-    try:
-        logging.info('Обновили валюты!')
+def parse_kcar() -> None: 
+    """Заготовка для функции"""
+    kcar_setttings = SITE_URLS.KCar
+    params = {
+        'currentPage': 1, 
+        'pageSize': 18, 
+        'sIndex': 1, 
+        'eIndex': 10, 
+        'creatYn': 'N',
+    }
+    url = kcar_setttings.catalog_url 
+    cookies = kcar_setttings.cookies
 
-        cars = AucCarsRest.objects.all()
-        for car in cars:
-            car.toll = int(calc_toll(car.finish, car.year, car.engine_volume, car.auc_table)[0])
-            car.save()
-
-        logging.info('Обновили авто')
-    except Exception as e:
-        print(f'Что-то не так с валютами !!!\n{e}')
+    response = requests.get(url, params=params, cookies=cookies)

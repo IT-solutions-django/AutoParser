@@ -112,9 +112,7 @@ class AucCars(models.Model):
         verbose_name = _("Автомобили")
         verbose_name_plural = _("Автомобили")
         
-    auc_table = models.CharField(verbose_name=_("Таблица во внешнем апи"), max_length=50) 
-    lot = models.CharField(verbose_name=_("Номер лота"), max_length=50) 
-    auc_name = models.CharField(verbose_name=_("Название аукциона"), max_length=50)     
+    lot = models.CharField(verbose_name=_("Номер лота"), max_length=50)    
     api_id = models.CharField(verbose_name=_("ID автомобиля"), max_length=50, unique=True)
     brand_country = models.ForeignKey(CountryModels, verbose_name=_("Страна производитель"), null=True, blank=True, default=None, on_delete=models.CASCADE)
     brand = models.CharField(verbose_name=_("Бренд"), max_length=50)
@@ -123,7 +121,8 @@ class AucCars(models.Model):
     mileage = models.IntegerField(verbose_name=_("Пробег"))
     photos = models.ManyToManyField(AucCarsPhoto, verbose_name='Фотографии автомобиля')
     toll = models.IntegerField(verbose_name=_("Пошлина"), null=True, blank=True)
-    kuzov = models.CharField(verbose_name=_("Тип кузова"), max_length=50)
+    body_type = models.CharField(verbose_name=_("Тип кузова"), max_length=50, null=True, blank=True)
+    body_brand = models.CharField(verbose_name=_("Кузов"), null=True, blank=True, max_length=50)
     transmission  = models.CharField(verbose_name=_("Тип КПП"), max_length=50)
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
     drive = models.CharField(verbose_name=_("Тип привода"), max_length=50)
@@ -132,15 +131,13 @@ class AucCars(models.Model):
     finish = models.CharField(verbose_name=_("Цена в валюте экспортера"), max_length=50)
     power_volume = models.CharField(verbose_name=_("Мощность двигателя"), max_length=30,null=True, blank=True)
     parsing_date = models.DateField(verbose_name=_("Дата парсинга"), auto_now=True) 
-    rubber = models.CharField(verbose_name=_("Руль"), max_length=30,null=True, blank=True, choices=RUBBER_CHOICES, default='Левый руль') 
     engine = models.CharField(verbose_name=_("Тип двигателя"), max_length=30,null=True, blank=True, choices=ENGINE_CHOICES, default='Бензин') 
     is_active = models.BooleanField()   
     month = models.CharField('Месяц', max_length=20, null=True, blank=True)
-    grade = models.CharField('Grade', max_length=200, null=True, blank=True)
-    kpp = models.CharField('КПП', max_length=100, null=True, blank=True)
-    equip = models.CharField('Equip', max_length=200, null=True, blank=True)
-    status = models.CharField('Статус', max_length=200, null=True, blank=True)
-    time = models.CharField('Time', max_length=10, null=True, blank=True)
+    grade = models.CharField('Комплектация', max_length=200, null=True, blank=True)
+    equip = models.CharField('Детали комплектации', max_length=200, null=True, blank=True)
+    auction = models.CharField('Аукцион', max_length=50)
+
 
     def __str__(self):
         return f"{self.brand} {self.model} {self.year}"

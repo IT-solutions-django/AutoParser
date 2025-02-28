@@ -150,11 +150,9 @@ def get_cars_count(table_name: str, filters: list[str]):
 
 def save_to_db(table, car, model, brand_country):
     try:
-        print('пробуем')
         if table == 'stats':
             active = True
         else:
-            print('неактивный')
             active = False
 
         color_tag = Color.objects.filter(api_value=car["COLOR"]).first()
@@ -186,39 +184,34 @@ def save_to_db(table, car, model, brand_country):
         print(toll)
         
         car_obj, created = model.objects.get_or_create(
-                auc_table = table,
-                auc_name = car["AUCTION"],       
-                api_id = car["ID"],
-                brand = car["MARKA_NAME"],
-                model = car["MODEL_NAME"],
-                brand_country=brand_country,
-                year = int(car["YEAR"]),
-                kuzov = car["KUZOV"],
-                mileage = int(car["MILEAGE"]),
-                toll = toll,
-                transmission="Механика" if car["KPP_TYPE"] == '1' else "Автомат",
-                engine_volume = car["ENG_V"],
-                drive=(
-                    "Передний привод" if car["PRIV"] == "FF" else
-                    "Задний привод" if car["PRIV"] in ("FR", "MR", "RR") else
-                    "Полный привод"
-                ),
-                color=color_tag.value.true_value if color_tag is not None else car["COLOR"],
-                rate = car["RATE"],
-                finish = car["FINISH"],
-                power_volume = int(car["PW"]) if car.get("PW") else 0,
-                is_active = active,
-                lot=car["LOT"],
-                rubber='Правый руль' if table == 'stats' else 'Левый руль',
-                engine = engine_type_name,
-                month=car["MONTH"],
-                grade=car["GRADE"],
-                kpp=car["KPP"],
-                equip=car["EQUIP"],
-                status=car["STATUS"],
-                time=car["TIME"],
+            auction = 'encar',       
+            api_id = car["ID"],
+            brand = car["MARKA_NAME"],
+            model = car["MODEL_NAME"],
+            brand_country=brand_country,
+            year = int(car["YEAR"]),
+            body_brand = car["KUZOV"],
+            mileage = int(car["MILEAGE"]),
+            toll = toll,
+            transmission="Механика" if car["KPP_TYPE"] == '1' else "Автомат",
+            engine_volume = car["ENG_V"],
+            drive=(
+                "Передний привод" if car["PRIV"] == "FF" else
+                "Задний привод" if car["PRIV"] in ("FR", "MR", "RR") else
+                "Полный привод"
+            ),
+            color=color_tag.value.true_value if color_tag is not None else car["COLOR"],
+            rate = car["RATE"],
+            finish = car["FINISH"],
+            power_volume = int(car["PW"]) if car.get("PW") else 0,
+            is_active = active,
+            lot=car["LOT"],
+            engine = engine_type_name,
+            month=car["MONTH"],
+            grade=car["GRADE"],
+            equip=car["EQUIP"],
         )
-        print(f'Объект машины: {car_obj}')
+        print(f'Объект авто: {car_obj}')
 
         if created:
             photo_urls = car["IMAGES"].split('#')
@@ -251,12 +244,12 @@ def check_model_manifacture(brand, id):
         return AucCars, brand_country
 
     except Exception as e:
-            logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
+        logging.error(f"Нет макри !!!!!!! {brand}, ID авто - {id}: {e}")
 
-            brand_country = CountryModels.objects.create(country="?", brand=brand)
-            brand_country.save()
+        brand_country = CountryModels.objects.create(country="?", brand=brand)
+        brand_country.save()
 
-            return AucCars, brand_country
+        return AucCars, brand_country
             
 cars_models = [..., ..., ..., ...]
 def delete_dublicate():
@@ -273,40 +266,11 @@ def delete_dublicate():
         except Exception as e:
             print(e)
 
-def change_colors():
-    color_pattern = r"'([^']+)'"
-    for model_c in [AucCarsEurope, ]:
-        cars = model_c.objects.all()
-        try:
-            for car in cars:
-                color_tag = Color.objects.filter(api_value__icontains=car.color).first()
-                print(color_tag)
-                if color_tag:
-                    car.color=color_tag.value.true_value
-                    car.save()
-        except Exception as e:
-            print(e)
-
-def change_rubber():
-    for model_c in cars_models:
-        cars = model_c.objects.all()
-        try:
-            for car in cars:
-                
-                if(car.auc_table != 'stats'):
-                    car.rubber = 'Левый руль'
-                else:
-                    car.rubber = 'Правый руль'
-                car.save()
-                print(car.rubber)
-
-        except Exception as e:
-            print(e)
 
 
 def parse_korea():
     table = 'korea'
-    objects = AucCars.objects.filter(auc_table=table)
+    objects = AucCars.objects.filter(auction='encar')
     for car in objects:
         car.is_active = False
         car.save()
@@ -322,7 +286,6 @@ def parse_korea():
                 f"{250 * page},{(250 * page) + 250 }",
             )
             data = fetch_by_query(query)
-            print('сделали запрос')
 
             for car in data:
                 try:
@@ -341,56 +304,12 @@ def parse_korea():
             page += 1
             
 
-            time.sleep(randint(40, 60))
-            print(f'Страница {page} позади')
+            time.sleep(randint(30, 50))
 
-        for model_c in cars_models:
-            objects = model_c.objects.filter(auc_table=table, is_active=False)
-            for car in objects:
-                car.delete() 
+        objects = AucCars.objects.filter(auc_table=table, is_active=False)
+        for car in objects:
+            car.delete() 
     except Exception as e:
             logging.error(f"Ошибка Корея: {e}")
             print(str(e))
             return None
-
-
-
-def revrite_color():
-    cars = AucCarsEurope.objects.all()
-    for car in cars:
-        color = car.color
-        color_tag = Color.objects.filter(api_value=color).first()
-        car.color=color_tag.true_value if color_tag is not None else color
-        car.save()
-       
-def change_engine_type():
-    for model_c in cars_models:
-        objects = model_c.objects.filter(engine__isnull=True)
-        for car in objects:
-            query = f"select+*+from+{car.auc_table}+WHERE+1+=+1+and+id+=+'{car.api_id}'"
-
-            data = fetch_by_query(query)
-            print(data)
-            if(data):
-                car_api = data[0]
-                if(car_api['TIME'] == 'D'):
-                    engine_type_name = 'Дизель'
-                elif(car_api['TIME'] == 'E'):
-                    engine_type = 2
-                    engine_type_name = 'Электро'
-                elif(car_api['TIME'] == 'H'):
-                    engine_type = 3
-                    engine_type_name = 'Гибрид'
-                elif(car_api['TIME'] in ('G', 'C', 'L', 'P')):
-                    engine_type_name = 'Бензин'
-                else:
-                    engine_type_name = 'Бензин'
-                car.engine = engine_type_name
-                car.save()
-            else:
-                car.delete()
-            time.sleep(randint(20, 30))
-
-
-def clean_USA():
-    AucCarsRest.objects.all().delete()
