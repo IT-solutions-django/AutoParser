@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from datetime import datetime
 
 
 def update_jpy() -> None: 
@@ -81,14 +81,18 @@ def get_cny_rate() -> float:
 
 def get_krw_rate() -> float: 
     krw_url = ST.KRW_URL 
-    response = requests.get(krw_url)
+    today = datetime.today().strftime("%d.%m.%Y")
+    params = {
+        'date_from': today, 
+        'date_to': today
+    }
+    response = requests.get(krw_url, params)
     try:
-        soup = bs(response.text, 'lxml')
-        krw_row = soup.find_all('div', class_='rates__item')[-2] 
-        exchange_rate = krw_row.find('p', class_='rates__buy').text
-        return float(exchange_rate) / 1000
+        data = response.json()
+        krw_exchange_rate = data['DATA'][0]['UF_SALE']
+        return float(krw_exchange_rate) / 1000
     except Exception as e:
-        print(f'Ошибка при парсинге KRW: {e}')
+        print(f'Ошибка при парсинге KRW: {e}') 
         return 1
     
 
