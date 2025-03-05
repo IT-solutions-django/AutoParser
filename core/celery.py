@@ -25,4 +25,8 @@ app.conf.beat_schedule = {
         'task': 'currencies.tasks.update_cny_task',
         'schedule': crontab(hour=11, minute=0),
     },
+    'update_eur_and_usd_daily': {
+        'task': 'currencies.tasks.update_eur_and_usd_task',
+        'schedule': crontab(hour=11, minute=0),
+    },
 }
