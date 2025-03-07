@@ -11,7 +11,21 @@ services:
       - dev
     # ports:
     #   - "6379:6379"
-    
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: cars
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: adminroot
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - dev
+
   nginx:
     image: nginx:stable-alpine
     ports: 
@@ -39,10 +53,14 @@ services:
       - ./static:/var/www/static
     depends_on:
       - redis
+      - postgres
     env_file:
       - .env
     networks:
       - dev
+
+volumes:
+  pgdata:
 
 networks:
   dev:

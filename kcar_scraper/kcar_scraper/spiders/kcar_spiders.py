@@ -2,6 +2,7 @@ import scrapy
 import json
 from urllib.parse import urlencode
 from kcar_scraper.items import KcarScraperItem
+from cars.models import AucCars
 
 
 class KCarSpider(scrapy.Spider):
@@ -10,6 +11,8 @@ class KCarSpider(scrapy.Spider):
     page = 1
 
     def start_requests(self):
+        AucCars.objects.filter(auction="kcar").delete()
+
         url = self.build_url(self.page)
         yield scrapy.Request(url, callback=self.parse, cookies=self.get_cookies())
 
