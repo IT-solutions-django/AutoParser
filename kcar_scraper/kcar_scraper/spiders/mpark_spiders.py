@@ -2,7 +2,6 @@ import scrapy
 import json
 from urllib.parse import urlencode
 from kcar_scraper.kcar_scraper.items import KcarScraperItem
-from cars.models import AucCars
 
 
 class MparkSpider(scrapy.Spider):
@@ -10,6 +9,8 @@ class MparkSpider(scrapy.Spider):
     start_urls = ["https://api.m-park.co.kr/home/api/v1/wb/searchmycar/carlistinfo/get?"]
 
     def start_requests(self):
+        from cars.models import AucCars
+
         AucCars.objects.filter(auction="mpark").delete()
 
         yield scrapy.Request(self.start_urls[0], callback=self.parse, cookies=self.get_cookies())
