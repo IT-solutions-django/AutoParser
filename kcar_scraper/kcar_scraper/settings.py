@@ -106,5 +106,5 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 ITEM_PIPELINES = {
-    'kcar_scraper.kcar_scraper.pipelines.KcarScraperPipeline': 1,
+    'kcar_scraper.pipelines.KcarScraperPipeline': 1,
 }
