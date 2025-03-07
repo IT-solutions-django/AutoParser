@@ -3,6 +3,7 @@ import json
 from urllib.parse import urlencode
 from kcar_scraper.items import KcarScraperItem
 import xml.etree.ElementTree as ET
+from cars.models import AucCars
 
 
 class CharanchaSpider(scrapy.Spider):
@@ -11,6 +12,8 @@ class CharanchaSpider(scrapy.Spider):
     page = 1
 
     def start_requests(self):
+        AucCars.objects.filter(auction="charancha").delete()
+
         url = self.build_url(self.page)
         yield scrapy.Request(url, callback=self.parse, cookies=self.get_cookies())
 
