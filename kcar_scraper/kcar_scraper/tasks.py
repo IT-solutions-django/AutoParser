@@ -9,7 +9,7 @@ import os
 
 @shared_task
 def run_spiders_task():
-    os.environ.setdefault('SCRAPY_SETTINGS_MODULE', 'kcar_scraper.settings')
+    os.environ.setdefault('SCRAPY_SETTINGS_MODULE', 'kcar_scraper.kcar_scraper.settings')
 
     process = CrawlerProcess(get_project_settings())
 
