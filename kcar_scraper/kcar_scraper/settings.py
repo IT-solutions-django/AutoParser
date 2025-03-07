@@ -23,8 +23,8 @@ django.setup()
 
 BOT_NAME = "kcar_scraper"
 
-SPIDER_MODULES = ["kcar_scraper.spiders"]
-NEWSPIDER_MODULE = "kcar_scraper.spiders"
+SPIDER_MODULES = ["kcar_scraper.kcar_scraper.spiders"]
+NEWSPIDER_MODULE = "kcar_scraper.kcar_scraper.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
