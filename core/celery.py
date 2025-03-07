@@ -33,6 +33,6 @@ app.conf.beat_schedule = {
     },
     'run_spiders_daily': {
         'task': 'kcar_scraper.kcar_scraper.tasks.run_spiders_task',
-        'schedule': crontab(minute=55, hour=3),
+        'schedule': crontab(minute=15, hour=4),
     },
 }
