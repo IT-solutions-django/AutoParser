@@ -1,7 +1,7 @@
 import scrapy
 import json
 from urllib.parse import urlencode
-from kcar_scraper.items import KcarScraperItem
+from kcar_scraper.kcar_scraper.items import KcarScraperItem
 import xml.etree.ElementTree as ET
 from cars.models import AucCars
 
