@@ -127,7 +127,7 @@ class AucCars(models.Model):
     engine_volume = models.CharField(verbose_name=_("Объем двигателя"), max_length=50)
     drive = models.CharField(verbose_name=_("Тип привода"), max_length=50)
     color = models.CharField(verbose_name=_("Цвет"), max_length=50)
-    rate = models.CharField(verbose_name=_("Рейтинг"), max_length=5)
+    rate = models.CharField(verbose_name=_("Рейтинг"), max_length=50)
     finish = models.CharField(verbose_name=_("Цена в валюте экспортера"), max_length=50)
     power_volume = models.CharField(verbose_name=_("Мощность двигателя"), max_length=30,null=True, blank=True)
     parsing_date = models.DateField(verbose_name=_("Дата парсинга"), auto_now=True) 
