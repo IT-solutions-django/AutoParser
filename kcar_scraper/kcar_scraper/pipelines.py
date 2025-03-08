@@ -12,7 +12,7 @@ from cars.models import AucCars, AucCarsPhoto
 from asgiref.sync import sync_to_async
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=True)
 def save_car_data(item):
     try:
         car_obj, created = AucCars.objects.update_or_create(

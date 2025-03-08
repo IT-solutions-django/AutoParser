@@ -2,20 +2,26 @@ import scrapy
 import json
 from urllib.parse import urlencode
 from kcar_scraper.kcar_scraper.items import KcarScraperItem
+from asgiref.sync import sync_to_async
 
 
 class KCarSpider(scrapy.Spider):
     name = "kcar"
     start_urls = ["https://api.kcar.com/bc/timeDealCar/list"]
     page = 1
+    auction_value = "kcar"
 
     def start_requests(self):
-        from cars.models import AucCars
-
-        AucCars.objects.filter(auction="kcar").delete()
+        self.clear_database(self.auction_value)
 
         url = self.build_url(self.page)
         yield scrapy.Request(url, callback=self.parse, cookies=self.get_cookies())
+
+    @sync_to_async(thread_sensitive=True)
+    def clear_database(self, auction_value):
+        from cars.models import AucCars
+
+        AucCars.objects.filter(auction=auction_value).delete()
 
     def build_url(self, page):
         params = {
