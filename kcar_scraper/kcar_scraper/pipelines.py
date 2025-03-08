@@ -27,7 +27,7 @@ def save_car_data(item):
                 "engine_volume": item["engine_volume"] or "Не определено",
                 "drive": item["drive"] or "Не определено",
                 "color": item["color"] or "Не определено",
-                "rate": item["rate"] or "Не определено",
+                "rate": item["rate"] or "Нет",
                 "finish": item["finish"] or "Не определено",
                 "power_volume": item["power_volume"],
                 "is_active": True,
