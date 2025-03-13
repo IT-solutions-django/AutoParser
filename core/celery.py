@@ -11,8 +11,9 @@ app = Celery(
 ) 
 app.config_from_object('django.conf:settings', namespace='CELERY') 
 app.autodiscover_tasks()
+app.autodiscover_tasks(['kcar_scraper'])
 
-import kcar_scraper.kcar_scraper.tasks
+
 
 app.conf.beat_schedule = {
     'update_jpy_daily': {
