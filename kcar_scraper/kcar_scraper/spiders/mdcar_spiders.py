@@ -2,7 +2,7 @@ import scrapy
 import re
 import json
 from urllib.parse import urlencode
-from kcar_scraper.kcar_scraper.items import KcarScraperItem
+from kcar_scraper.items import KcarScraperItem
 
 
 class MdcarSpider(scrapy.Spider):

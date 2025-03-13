@@ -10,4 +10,8 @@ urlpatterns = [
 
     path('load-brands/', LoadMarksView.as_view()),
     path('delete-brands/', DeleteMarksView.as_view()),
+
+    path('translation-mark/', TranslateMark.as_view()),
+    path('translation-model/', TranslateModel.as_view()),
+    path('translation-color/', TranslateColor.as_view()),
 ]

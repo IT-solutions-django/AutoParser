@@ -1,20 +1,40 @@
 from celery import shared_task
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
-from .spiders.kcar_spiders import KCarSpider
-from .spiders.mpark_spiders import MparkSpider
-from .spiders.charancha_spiders import CharanchaSpider
 import os
+import subprocess
+import logging
+from cars.services import translate_and_save
 
 
 @shared_task
 def run_spiders_task():
-    os.environ.setdefault('SCRAPY_SETTINGS_MODULE', 'kcar_scraper.kcar_scraper.settings')
+    scrapy_project_path = '/kcar_scraper'
 
-    process = CrawlerProcess(get_project_settings())
+    spiders = ['kcar', 'mpark', 'charancha', 'bobaedream']
 
-    process.crawl(KCarSpider)
-    process.crawl(MparkSpider)
-    process.crawl(CharanchaSpider)
+    for spider in spiders:
+        command = f"scrapy crawl {spider}"
+        try:
+            os.chdir(scrapy_project_path)
 
-    process.start()
+            logging.info(f"Текущая рабочая директория после перехода: {os.getcwd()}")
+
+            clear_database(spider)
+
+            subprocess.run(command, shell=True, check=True)
+
+            post_process()
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Ошибка при запуске {spider}: {e}")
+
+
+def post_process():
+    translate_and_save("RuBrandCar", "brand", "ru_brand")
+    translate_and_save("RuModelCar", "model", "ru_model")
+    translate_and_save("RuColorCar", "color", "ru_color", target_language='ru')
+
+
+def clear_database(auction_value):
+    from cars.models import AucCars
+
+    AucCars.objects.filter(auction=auction_value).delete()
