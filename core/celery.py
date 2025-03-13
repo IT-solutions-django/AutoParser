@@ -12,7 +12,7 @@ app = Celery(
 app.config_from_object('django.conf:settings', namespace='CELERY') 
 app.autodiscover_tasks()
 
-import kcar_scraper.kcar_scraper.tasks
+import kcar_scraper.tasks
 
 app.conf.beat_schedule = {
     'update_jpy_daily': {
@@ -33,6 +33,6 @@ app.conf.beat_schedule = {
     },
     'run_spiders_daily': {
         'task': 'kcar_scraper.kcar_scraper.tasks.run_spiders_task',
-        'schedule': crontab(minute=0, hour=3),
+        'schedule': crontab(minute=20, hour=3),
     },
 }
