@@ -13,13 +13,11 @@ def run_spiders_task():
     for spider in spiders:
         command = f"scrapy crawl {spider}"
         try:
-            os.chdir(scrapy_project_path)
-
             logging.info(f"Текущая рабочая директория после перехода: {os.getcwd()}")
 
             clear_database(spider)
 
-            subprocess.run(command, shell=True, check=True)
+            subprocess.run(command, shell=True, check=True, cwd=scrapy_project_path)
 
             post_process()
 
