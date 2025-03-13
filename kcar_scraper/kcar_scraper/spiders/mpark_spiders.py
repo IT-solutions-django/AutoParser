@@ -1,7 +1,7 @@
 import scrapy
 import json
 from urllib.parse import urlencode
-from kcar_scraper.kcar_scraper.items import KcarScraperItem
+from kcar_scraper.items import KcarScraperItem
 from asgiref.sync import sync_to_async
 
 
@@ -11,15 +11,7 @@ class MparkSpider(scrapy.Spider):
     auction_value = "mpark"
 
     def start_requests(self):
-        self.clear_database(self.auction_value)
-
         yield scrapy.Request(self.start_urls[0], callback=self.parse, cookies=self.get_cookies())
-
-    @sync_to_async(thread_sensitive=True)
-    def clear_database(self, auction_value):
-        from cars.models import AucCars
-
-        AucCars.objects.filter(auction=auction_value).delete()
 
     def get_cookies(self):
         return {}

@@ -10,7 +10,7 @@ from rest_framework import generics
 from itertools import chain
 from .models import AucCars
 from .auc_parser import *
-from .services import parse_kcar
+from .services import parse_kcar, translate_and_save
 
 
 
@@ -44,3 +44,21 @@ class ParseKcarView(View):
     def get(self, request): 
         parse_kcar() 
         return HttpResponse('Парсинг kcar.com')
+
+
+class TranslateMark(View):
+    def get(self, request):
+        translate_and_save("RuBrandCar", "brand", "ru_brand")
+        return HttpResponse('Перевод марок авто')
+
+
+class TranslateModel(View):
+    def get(self, request):
+        translate_and_save("RuModelCar", "model", "ru_model")
+        return HttpResponse('Перевод моделей авто')
+
+
+class TranslateColor(View):
+    def get(self, request):
+        translate_and_save("RuColorCar", "color", "ru_color", target_language='ru')
+        return HttpResponse('Перевод цветов авто')

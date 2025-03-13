@@ -29,3 +29,40 @@ class EngineAdmin(admin.ModelAdmin):
 class AucCarsAdmin(admin.ModelAdmin):
     pass
 
+
+@admin.register(RuBrandCar)
+class RuBrandCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuModelCar)
+class RuModelCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuColorCar)
+class RuColorCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuTransmissionCar)
+class RuTransmissionCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuDriveCar)
+class RuDriveCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuEngineCar)
+class RuEngineCarAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(RuBodyTypeCar)
+class RuBodyTypeCarAdmin(admin.ModelAdmin):
+    pass
+
+
+

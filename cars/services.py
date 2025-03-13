@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from .models import *
 import logging
 import requests
@@ -6,6 +8,7 @@ import json
 from .config import SITE_URLS
 from .auc_parser import check_model_manifacture
 import time
+from django.apps import apps
 
 logger = logging.getLogger(__name__)
 
@@ -303,3 +306,49 @@ def parse_charancha() -> None:
         time.sleep(10)
 
         current_page += 1
+
+
+API_KEY = "AQVN1Zdx8acTpDcE-dtFj34XU_bcD33f4L8hjFwR"
+URL = "https://translate.api.cloud.yandex.net/translate/v2/translate"
+
+
+def create_headers():
+    return {
+        "Content-Type": "application/json",
+        "Authorization": f"Api-Key {API_KEY}"
+    }
+
+
+def translate_and_save(model_name, original_field, translated_field, target_language="en", source_language="ko"):
+
+    ModelClass = apps.get_model("cars", model_name)
+
+    existing_values = ModelClass.objects.values_list(original_field, flat=True)
+    new_values = list(
+        AucCars.objects.exclude(**{f"{original_field}__in": existing_values}).values_list(original_field, flat=True).distinct()
+    )
+
+    if not new_values:
+        return
+
+    data = {
+        "targetLanguageCode": target_language,
+        "texts": new_values,
+        "sourceLanguageCode": source_language
+    }
+
+    response = requests.post(URL, headers=create_headers(), json=data)
+
+    if response.status_code == 200:
+        translations = response.json().get("translations", [])
+
+        translated_objects = [
+            ModelClass(**{original_field: orig, translated_field: trans["text"]})
+            for orig, trans in zip(new_values, translations)
+        ]
+
+        with transaction.atomic():
+            ModelClass.objects.bulk_create(translated_objects)
+
+    else:
+        logger.error("Ошибка:", response.status_code, response.text)
