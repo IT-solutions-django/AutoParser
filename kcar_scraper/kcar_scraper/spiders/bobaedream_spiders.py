@@ -10,12 +10,12 @@ class BobaedreamSpider(scrapy.Spider):
     auction_value = "bobaedream"
 
     custom_settings = {
-        "DOWNLOAD_DELAY": 1,
+        "DOWNLOAD_DELAY": 0.3,
         "RANDOMIZE_DOWNLOAD_DELAY": True,
         "AUTOTHROTTLE_ENABLED": True,
-        "AUTOTHROTTLE_START_DELAY": 1,
-        "AUTOTHROTTLE_MAX_DELAY": 5,
-        "AUTOTHROTTLE_TARGET_CONCURRENCY": 1.0,
+        "AUTOTHROTTLE_START_DELAY": 0.5,
+        "AUTOTHROTTLE_MAX_DELAY": 2,
+        "AUTOTHROTTLE_TARGET_CONCURRENCY": 3.0,
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
