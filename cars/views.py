@@ -180,7 +180,7 @@ def get_filter_cars(request):
             "year": car.year,
             "price": car.finish,
             "mileage": car.mileage,
-            "photo": car.photos.first().url if car.photos.exists() else None
+            "photo": car.photos.all()[1].url if car.photos.count() > 1 else None
         }
         for car in paginated_cars
     ]
