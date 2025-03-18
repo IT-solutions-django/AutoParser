@@ -93,7 +93,7 @@ def get_filter_cars(request):
     mileage_from = request.GET.get('mileage_from')
     mileage_to = request.GET.get('mileage_to')
     auction = request.GET.get('auction')
-    color = request.GET.getl('color')
+    color = request.GET.get('color')
     page = int(request.GET.get('page', 1))
 
     param_filter = Q()
