@@ -79,41 +79,60 @@ class TranslateColor(View):
 
 def get_filter_cars(request):
     brand = request.GET.get('brand')
+    brand_list = brand.split(',') if brand else []
+
     drive = request.GET.get('drive')
+    drive_list = drive.split(',') if drive else []
+
     transmission = request.GET.get('transmission')
+    transmission_list = transmission.split(',') if transmission else []
+
     engine_volume_from = request.GET.get('engine_volume_from')
     engine_volume_to = request.GET.get('engine_volume_to')
+
     model = request.GET.get('model')
+    model_list = model.split(',') if model else []
+
     year_from = request.GET.get('year_from')
     year_to = request.GET.get('year_to')
+
     car_fuel = request.GET.get('car_fuel')
+    car_fuel_list = car_fuel.split(',') if car_fuel else []
+
     car_type = request.GET.get('car_type')
+    car_type_list = car_type.split(',') if car_type else []
+
     price_from = request.GET.get('price_from')
     price_to = request.GET.get('price_to')
+
     mileage_from = request.GET.get('mileage_from')
     mileage_to = request.GET.get('mileage_to')
+
     auction = request.GET.get('auction')
+
     color = request.GET.get('color')
+    color_list = color.split(',') if color else []
+
     page = int(request.GET.get('page', 1))
 
     param_filter = Q()
 
-    if brand:
-        param_filter &= Q(brand__in=brand)
-    if drive:
-        param_filter &= Q(drive__in=drive)
-    if transmission:
-        param_filter &= Q(transmission__in=transmission)
-    if model:
-        param_filter &= Q(model__in=model)
-    if car_fuel:
-        param_filter &= Q(engine__in=car_fuel)
-    if car_type:
-        param_filter &= Q(body_type__in=car_type)
+    if brand_list:
+        param_filter &= Q(brand__in=brand_list)
+    if drive_list:
+        param_filter &= Q(drive__in=drive_list)
+    if transmission_list:
+        param_filter &= Q(transmission__in=transmission_list)
+    if model_list:
+        param_filter &= Q(model__in=model_list)
+    if car_fuel_list:
+        param_filter &= Q(engine__in=car_fuel_list)
+    if car_type_list:
+        param_filter &= Q(body_type__in=car_type_list)
     if auction:
         param_filter &= Q(auction=auction)
-    if color:
-        param_filter &= Q(color__in=color)
+    if color_list:
+        param_filter &= Q(color__in=color_list)
     if engine_volume_from:
         param_filter &= Q(engine_volume__gte=engine_volume_from)
     if engine_volume_to:
