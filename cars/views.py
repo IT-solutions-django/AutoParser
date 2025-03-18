@@ -78,7 +78,7 @@ class TranslateColor(View):
 
 
 def get_filter_cars(request):
-    trusted_ip = '94.241.142.204'
+    trusted_ip = '193.164.149.51'
 
     real_ip = request.META.get('HTTP_X_REAL_IP', None)
     forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
@@ -192,7 +192,7 @@ def get_filter_cars(request):
 
 
 def get_brands(request):
-    trusted_ip = '94.241.142.204'
+    trusted_ip = '193.164.149.51'
 
     real_ip = request.META.get('HTTP_X_REAL_IP', None)
     forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
@@ -214,7 +214,7 @@ def get_brands(request):
 
 
 def get_models(request):
-    trusted_ip = '94.241.142.204'
+    trusted_ip = '193.164.149.51'
 
     real_ip = request.META.get('HTTP_X_REAL_IP', None)
     forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
