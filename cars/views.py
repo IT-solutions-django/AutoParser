@@ -78,6 +78,20 @@ class TranslateColor(View):
 
 
 def get_filter_cars(request):
+    trusted_ip = '94.241.142.204'
+
+    real_ip = request.META.get('HTTP_X_REAL_IP', None)
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
+
+    if real_ip:
+        if real_ip != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    if forwarded_for:
+        forwarded_ips = forwarded_for.split(',')
+        if forwarded_ips[0].strip() != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
     brand = request.GET.get('brand')
     brand_list = brand.split(',') if brand else []
 
@@ -164,12 +178,9 @@ def get_filter_cars(request):
             "transmission": car.transmission,
             "engine_volume": car.engine_volume,
             "year": car.year,
-            "car_fuel": car.engine,
-            "car_type": car.body_type,
             "price": car.finish,
             "mileage": car.mileage,
-            "auction": car.auction,
-            "color": car.color,
+            "photo": car.photos.first().url if car.photos.exists() else None
         }
         for car in paginated_cars
     ]
@@ -181,6 +192,20 @@ def get_filter_cars(request):
 
 
 def get_brands(request):
+    trusted_ip = '94.241.142.204'
+
+    real_ip = request.META.get('HTTP_X_REAL_IP', None)
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
+
+    if real_ip:
+        if real_ip != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    if forwarded_for:
+        forwarded_ips = forwarded_for.split(',')
+        if forwarded_ips[0].strip() != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
     brands_car = RuBrandCar.objects.values_list('brand', 'ru_brand')
 
     data_brand = list(brands_car)
@@ -189,6 +214,20 @@ def get_brands(request):
 
 
 def get_models(request):
+    trusted_ip = '94.241.142.204'
+
+    real_ip = request.META.get('HTTP_X_REAL_IP', None)
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', None)
+
+    if real_ip:
+        if real_ip != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    if forwarded_for:
+        forwarded_ips = forwarded_for.split(',')
+        if forwarded_ips[0].strip() != trusted_ip:
+            return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
     models_car = RuModelCar.objects.values_list('model', 'ru_model')
 
     data_model = list(models_car)
