@@ -15,5 +15,7 @@ urlpatterns = [
     path('translation-model/', TranslateModel.as_view()),
     path('translation-color/', TranslateColor.as_view()),
 
-    path('get-brands/', get_brands, name='get-brands')
+    path('get-brands/', get_brands, name='get-brands'),
+    path('get-models/', get_models, name='get-models'),
+    path('get-cars/', get_filter_cars, name='get-cars'),
 ]
