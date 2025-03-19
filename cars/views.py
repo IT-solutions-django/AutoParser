@@ -154,7 +154,7 @@ def get_filter_cars(request):
     if mileage_to:
         param_filter &= Q(mileage__lte=mileage_to)
 
-    cars = AucCars.objects.filter(param_filter)
+    cars = AucCars.objects.filter(param_filter).prefetch_related("photos")
 
     paginator = Paginator(cars, 16)
     paginated_cars = paginator.get_page(page)
@@ -171,7 +171,7 @@ def get_filter_cars(request):
             "price": car.finish,
             "mileage": car.mileage,
             "auction": car.auction,
-            "photo": car.photos.first().url if car.photos.exists() else None
+            "photo": list(car.photos.all())[4].url if car.auction == "kcar" and car.photos.count() > 4 else car.photos.first().url if car.photos.exists() else None
         }
         for car in paginated_cars
     ]
@@ -255,3 +255,25 @@ def get_car(request):
             {"car": []},
             json_dumps_params={"ensure_ascii": False},
         )
+
+
+def get_ru_brand(request):
+    ip_addr = request.GET.get('ip')
+    if not ip_addr or ip_addr != '94.241.142.204':
+        return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    orig_brand = request.GET.get('brand')
+    ru_brand = RuBrandCar.objects.filter(brand=orig_brand).values_list("ru_brand", flat=True).first()
+
+    return ru_brand
+
+
+def get_ru_model(request):
+    ip_addr = request.GET.get('ip')
+    if not ip_addr or ip_addr != '94.241.142.204':
+        return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    orig_model = request.GET.get('model')
+    ru_model = RuBrandCar.objects.filter(model=orig_model).values_list("ru_model", flat=True).first()
+
+    return ru_model
