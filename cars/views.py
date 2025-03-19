@@ -170,7 +170,7 @@ def get_filter_cars(request):
             "year": car.year,
             "price": car.finish,
             "mileage": car.mileage,
-            "photo": car.photos.all()[1].url if car.photos.count() > 1 else None
+            "photo": car.photos.first().url if car.photos.exists() else None
         }
         for car in paginated_cars
     ]
@@ -207,5 +207,15 @@ def get_models(request):
     models_queryset = RuModelCar.objects.filter(
         model__in=AucCars.objects.filter(brand__in=brand_list).values_list('model', flat=True)
     ).values_list('model', 'ru_model')
+
+    return JsonResponse(list(models_queryset), safe=False, json_dumps_params={"ensure_ascii": False})
+
+
+def get_models_all(request):
+    ip_addr = request.GET.get('ip')
+    if not ip_addr or ip_addr != '94.241.142.204':
+        return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    models_queryset = RuModelCar.objects.values_list('model', 'ru_model')
 
     return JsonResponse(list(models_queryset), safe=False, json_dumps_params={"ensure_ascii": False})
