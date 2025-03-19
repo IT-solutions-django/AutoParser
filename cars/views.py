@@ -265,7 +265,10 @@ def get_ru_brand(request):
     orig_brand = request.GET.get('brand')
     ru_brand = RuBrandCar.objects.filter(brand=orig_brand).values_list("ru_brand", flat=True).first()
 
-    return ru_brand
+    return JsonResponse(
+        {"ru_brand": ru_brand},
+        json_dumps_params={"ensure_ascii": False},
+    )
 
 
 def get_ru_model(request):
@@ -276,4 +279,7 @@ def get_ru_model(request):
     orig_model = request.GET.get('model')
     ru_model = RuBrandCar.objects.filter(model=orig_model).values_list("ru_model", flat=True).first()
 
-    return ru_model
+    return JsonResponse(
+        {"ru_model": ru_model},
+        json_dumps_params={"ensure_ascii": False},
+    )
