@@ -19,4 +19,5 @@ urlpatterns = [
     path('get-models/', get_models, name='get-models'),
     path('get-cars/', get_filter_cars, name='get-cars'),
     path('get-all-models/', get_models_all, name='get-all-models'),
+    path('get-car/', get_car, name='get-car'),
 ]
