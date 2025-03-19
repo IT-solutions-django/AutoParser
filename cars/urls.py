@@ -20,4 +20,6 @@ urlpatterns = [
     path('get-cars/', get_filter_cars, name='get-cars'),
     path('get-all-models/', get_models_all, name='get-all-models'),
     path('get-car/', get_car, name='get-car'),
+    path('get-ru-brand/', get_ru_brand, name='get-ru-brand'),
+    path('get-ru-model/', get_ru_model, name='get-ru-model'),
 ]
