@@ -277,7 +277,7 @@ def get_ru_model(request):
         return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
 
     orig_model = request.GET.get('model')
-    ru_model = RuBrandCar.objects.filter(model=orig_model).values_list("ru_model", flat=True).first()
+    ru_model = RuModelCar.objects.filter(model=orig_model).values_list("ru_model", flat=True).first()
 
     return JsonResponse(
         {"ru_model": ru_model},
