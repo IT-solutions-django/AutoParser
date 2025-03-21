@@ -27,6 +27,11 @@ class Currency(models.Model):
         verbose_name=_("Курс"),
     )
 
+    exchange_rate_cbr = models.FloatField(
+        default=0.0, 
+        verbose_name='Курс по Центробанку РФ'
+    )
+
     updated_at = models.DateTimeField(
         auto_now=True
     )
