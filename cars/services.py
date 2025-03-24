@@ -331,24 +331,28 @@ def translate_and_save(model_name, original_field, translated_field, target_lang
     if not new_values:
         return
 
-    data = {
-        "targetLanguageCode": target_language,
-        "texts": new_values,
-        "sourceLanguageCode": source_language
-    }
+    batch_size = 100
+    batches = [new_values[i:i + batch_size] for i in range(0, len(new_values), batch_size)]
 
-    response = requests.post(URL, headers=create_headers(), json=data)
+    for batch in batches:
+        data = {
+            "targetLanguageCode": target_language,
+            "texts": batch,
+            "sourceLanguageCode": source_language
+        }
 
-    if response.status_code == 200:
-        translations = response.json().get("translations", [])
+        response = requests.post(URL, headers=create_headers(), json=data)
 
-        translated_objects = [
-            ModelClass(**{original_field: orig, translated_field: trans["text"]})
-            for orig, trans in zip(new_values, translations)
-        ]
+        if response.status_code == 200:
+            translations = response.json().get("translations", [])
 
-        with transaction.atomic():
-            ModelClass.objects.bulk_create(translated_objects)
+            translated_objects = [
+                ModelClass(**{original_field: orig, translated_field: trans["text"]})
+                for orig, trans in zip(batch, translations)
+            ]
 
-    else:
-        logger.error("Ошибка:", response.status_code, response.text)
+            with transaction.atomic():
+                ModelClass.objects.bulk_create(translated_objects)
+
+        else:
+            logger.error("Ошибка:", response.status_code, response.text)

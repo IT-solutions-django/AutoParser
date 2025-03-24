@@ -30,6 +30,8 @@ class MparkSpider(scrapy.Spider):
             yield scrapy.Request(details_url, callback=self.parse_details, meta={"car": car})
 
     def parse_details(self, response):
+        from cars.sub_fun import calc_toll
+
         car = response.meta["car"]
         details = json.loads(response.text).get("data", {}).get("detailInfo", {})[0]
 
@@ -40,6 +42,24 @@ class MparkSpider(scrapy.Spider):
             month = month_full.split('/')[1]
         else:
             month = None
+
+        toll = None
+
+        try:
+            if car.get('demoAmt') and car.get('yyyy') and details.get("numCc"):
+
+                if details.get("carGas") in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타',
+                                         '가솔린/LPG겸용', '가솔린 하이브리드', '디젤 하이브리드']:
+                    engine_type = 3
+                elif details.get("carGas") in ['전기']:
+                    engine_type = 2
+                else:
+                    engine_type = None
+
+                toll = calc_toll(int(car.get('demoAmt')), int(car.get('yyyy')), int(details.get("numCc")), 'korea',
+                                 engine_type)
+        except Exception as e:
+            print('Ошибка в пошлине на сайте аукциона. ', e)
 
         yield KcarScraperItem(
             api_id=car.get("demoNo"),
@@ -62,5 +82,6 @@ class MparkSpider(scrapy.Spider):
             power_volume=None,
             body_brand=None,
             lot=None,
+            toll=toll,
             auction="mpark"
         )
