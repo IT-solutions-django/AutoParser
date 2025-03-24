@@ -28,3 +28,4 @@ class KcarScraperItem(scrapy.Item):
     month = scrapy.Field()
     body_brand = scrapy.Field()
     auction = scrapy.Field()
+    toll = scrapy.Field()
