@@ -10,6 +10,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
+from bs4 import BeautifulSoup
+from django.utils.timezone import now
 
 
 def update_jpy() -> None: 
@@ -43,6 +45,69 @@ def update_eur_and_usd() -> None:
 
     eur.save()
     usd.save()
+
+
+def update_all_currencies_from_central_bank() -> None: 
+    url = 'https://www.cbr.ru/currency_base/daily/'
+    html = requests.get(url).text
+
+    soup = BeautifulSoup(html, 'lxml') 
+
+    currencies = Currency.objects.all()
+    for currency in currencies:
+        tr_element = soup.find(lambda tag: tag.name == "tr" and tag.find("td", string=currency.name))
+        _, curr_code, quantity, _, exchange_rate_raw = map(lambda x: x.text, tr_element.find_all('td'))
+        exchange_rate = float(exchange_rate_raw.replace(',', '.')) / int(quantity) 
+
+        currency.exchange_rate_cbr = exchange_rate
+        currency.save()
+
+
+def update_all_currencies_from_tks() -> None: 
+    formatted_date = now().strftime("%Y%m%d")
+    url = f'https://www.tks.ru/currency/{formatted_date}/' 
+    try:
+        response = requests.get(url)
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        curr_table = soup.find('table', class_='curr_print')
+        
+        if not curr_table:
+            raise ValueError("Таблица с курсами валют не найдена")
+            
+        for row in curr_table.find_all('tr')[1:]: 
+            cols = row.find_all('td')
+            if len(cols) < 4:
+                continue
+                
+            curr_name = cols[3].text.strip()
+            exchange_rate = float(cols[1].text.strip())
+            count = int(cols[2].text.strip())
+            
+            currency_code = None
+            if curr_name == 'ВОН':
+                currency_code = 'KRW'
+            elif curr_name == 'ЕВРО':
+                currency_code = 'EUR'
+            elif curr_name == 'ИЕН':
+                currency_code = 'JPY'
+            elif curr_name == 'ЮАНЬ':
+                currency_code = 'CNY'
+            elif curr_name == 'ДОЛЛАР США':
+                currency_code = 'USD'
+                
+            if currency_code:
+                try:
+                    currency = Currency.objects.get(name=currency_code)
+                    currency.exchange_rate_tks = exchange_rate / count
+                    currency.save()
+                except Currency.DoesNotExist:
+                    continue
+                    
+    except requests.RequestException as e:
+        print(f"Ошибка при запросе к ТКС: {e}")
+    except Exception as e:
+        print(f"Ошибка при обработке данных: {e}")
 
 
 def get_jpy_rate() -> float:
