@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 from bs4 import BeautifulSoup
+from django.utils.timezone import now
 
 
 def update_jpy() -> None: 
@@ -60,6 +61,53 @@ def update_all_currencies_from_central_bank() -> None:
 
         currency.exchange_rate_cbr = exchange_rate
         currency.save()
+
+
+def update_all_currencies_from_tks() -> None: 
+    formatted_date = now().strftime("%Y%m%d")
+    url = f'https://www.tks.ru/currency/{formatted_date}/' 
+    try:
+        response = requests.get(url)
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        curr_table = soup.find('table', class_='curr_print')
+        
+        if not curr_table:
+            raise ValueError("Таблица с курсами валют не найдена")
+            
+        for row in curr_table.find_all('tr')[1:]: 
+            cols = row.find_all('td')
+            if len(cols) < 4:
+                continue
+                
+            curr_name = cols[3].text.strip()
+            exchange_rate = float(cols[1].text.strip())
+            count = int(cols[2].text.strip())
+            
+            currency_code = None
+            if curr_name == 'ВОН':
+                currency_code = 'KRW'
+            elif curr_name == 'ЕВРО':
+                currency_code = 'EUR'
+            elif curr_name == 'ИЕН':
+                currency_code = 'JPY'
+            elif curr_name == 'ЮАНЬ':
+                currency_code = 'CNY'
+            elif curr_name == 'ДОЛЛАР США':
+                currency_code = 'USD'
+                
+            if currency_code:
+                try:
+                    currency = Currency.objects.get(name=currency_code)
+                    currency.exchange_rate_tks = exchange_rate / count
+                    currency.save()
+                except Currency.DoesNotExist:
+                    continue
+                    
+    except requests.RequestException as e:
+        print(f"Ошибка при запросе к ТКС: {e}")
+    except Exception as e:
+        print(f"Ошибка при обработке данных: {e}")
 
 
 def get_jpy_rate() -> float:

@@ -40,6 +40,14 @@ app.conf.beat_schedule = {
         'task': 'currencies.tasks.update_eur_and_usd_task',
         'schedule': crontab(hour=11, minute=0),
     },
+    'update_currencies_from_cbr': {
+        'task': 'currencies.tasks.update_currencies_from_central_bank_task',
+        'schedule': crontab(hour=11, minute=0),
+    },
+    'update_currencies_from_tks': {
+        'task': 'currencies.tasks.update_currencies_from_tks_task',
+        'schedule': crontab(hour=11, minute=0),
+    },
     # 'run_spiders_daily': {
     #     'task': 'kcar_scraper.kcar_scraper.tasks.run_spiders_task',
     #     'schedule': crontab(minute=20, hour=3),
