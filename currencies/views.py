@@ -44,7 +44,7 @@ class UpdateFromCentralBank(View):
 
 class UpdateteFromTks(View): 
     def get(self, request): 
-        update_all_currencies_from_tks 
+        update_all_currencies_from_tks()
         return HttpResponse('Курсы всех валют обновлены по ТКС')
     
 
