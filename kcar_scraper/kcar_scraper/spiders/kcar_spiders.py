@@ -49,9 +49,27 @@ class KCarSpider(scrapy.Spider):
         yield scrapy.Request(self.build_url(self.page), callback=self.parse, cookies=self.get_cookies())
 
     def parse_details(self, response):
+        from cars.sub_fun import calc_toll
+
         car = response.meta["car"]
         details = json.loads(response.text).get("data", {}).get("rvo", {})
         photos = [p["elanPath"] for p in json.loads(response.text).get("data", {}).get("photoList", [])]
+
+        toll = None
+
+        try:
+            if car.get('prc') and car.get('prdcnYr') and car.get('engdispmnt'):
+
+                if car.get('fuelNm') in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용', '가솔린 하이브리드', '디젤 하이브리드']:
+                    engine_type = 3
+                elif car.get('fuelNm') in ['전기']:
+                    engine_type = 2
+                else:
+                    engine_type = None
+
+                toll = calc_toll(int(car.get('prc')), int(car.get('prdcnYr')), int(car.get('engdispmnt')), 'korea', engine_type)
+        except Exception as e:
+            print('Ошибка в пошлине на сайте аукциона. ', e)
 
         yield KcarScraperItem(
             api_id=car.get("carCd"),
@@ -74,5 +92,6 @@ class KCarSpider(scrapy.Spider):
             power_volume=None,
             body_brand=None,
             lot=None,
+            toll=toll,
             auction="kcar"
         )

@@ -22,7 +22,7 @@ def save_car_data(item):
                 "model": item["model"] or "Не определено",
                 "year": item["year"] or 0,
                 "mileage": int(float(item["mileage"])) if item["mileage"] else 0,
-                "toll": -1,  # FIXME: заменить на calc_toll
+                "toll": item["toll"] if item["toll"] else -1,
                 "transmission": item["transmission"] or "Не определено",
                 "engine_volume": item["engine_volume"] or "Не определено",
                 "drive": item["drive"] or "Не определено",

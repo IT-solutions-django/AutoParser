@@ -37,6 +37,8 @@ class BobaedreamSpider(scrapy.Spider):
             yield response.follow(next_page, self.parse, meta={'page_number': page_number + 1})
 
     def parse_car(self, response):
+        from cars.sub_fun import calc_toll
+
         full_name_car = response.css('h3.tit::text').get(default='').strip()
         brand_car, model_car = (full_name_car.split(' ', 1) + [None])[:2]
 
@@ -56,6 +58,32 @@ class BobaedreamSpider(scrapy.Spider):
 
         engine_text = response.xpath('//th[contains(text(), "배기량")]/following-sibling::td[1]/text()').get()
         engine_volume = int(re.sub(r"[^\d]", "", engine_text.split("cc")[0]))
+
+        finish_toll = response.css('span.price::text').get()
+
+        if isinstance(finish_toll, str):
+            finish_toll = 0
+
+        engine_toll = response.xpath('//th[contains(text(), "연료")]/following-sibling::td[1]/text()').get()
+
+        toll = None
+
+        try:
+            if finish_toll and year and engine_volume and year != 0 and finish_toll != 0:
+
+                if engine_toll in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기',
+                                             '기타',
+                                             '가솔린/LPG겸용', '가솔린 하이브리드', '디젤 하이브리드']:
+                    engine_type = 3
+                elif engine_toll in ['전기']:
+                    engine_type = 2
+                else:
+                    engine_type = None
+
+                toll = calc_toll(int(finish_toll), year, engine_volume, 'korea',
+                                 engine_type)
+        except Exception as e:
+            print('Ошибка в пошлине на сайте аукциона. ', e)
 
         yield KcarScraperItem(
             api_id=api_id,
@@ -78,5 +106,6 @@ class BobaedreamSpider(scrapy.Spider):
             month=None,
             power_volume=None,
             body_brand=None,
+            toll=toll,
             lot=None,
         )
