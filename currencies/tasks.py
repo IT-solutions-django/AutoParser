@@ -29,3 +29,9 @@ def update_eur_and_usd_task():
 def update_currencies_from_central_bank_task(): 
     from .services import update_all_currencies_from_central_bank 
     update_all_currencies_from_central_bank()
+
+
+@shared_task 
+def update_currencies_from_tks_task(): 
+    from .services import update_all_currencies_from_tks 
+    update_all_currencies_from_tks()
