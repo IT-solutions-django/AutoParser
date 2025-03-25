@@ -67,7 +67,7 @@ class KCarSpider(scrapy.Spider):
                 else:
                     engine_type = None
 
-                toll = calc_toll(int(car.get('prc')), int(car.get('prdcnYr')), int(details.get("engdispmnt")), 'korea', engine_type)
+                toll = calc_toll(int(car.get('prc') * 1000), int(car.get('prdcnYr')), int(details.get("engdispmnt")), 'korea', engine_type)
         except Exception as e:
             print('Ошибка в пошлине на сайте аукциона. ', e)
 

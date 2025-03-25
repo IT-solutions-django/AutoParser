@@ -55,7 +55,7 @@ class CharanchaSpider(scrapy.Spider):
                     else:
                         engine_type = None
 
-                    toll = calc_toll(int(finish_toll), int(year_toll), int(engine_volume_toll), 'korea',
+                    toll = calc_toll(int(finish_toll) * 1000, int(year_toll), int(engine_volume_toll), 'korea',
                                      engine_type)
             except Exception as e:
                 print('Ошибка в пошлине на сайте аукциона. ', e)
