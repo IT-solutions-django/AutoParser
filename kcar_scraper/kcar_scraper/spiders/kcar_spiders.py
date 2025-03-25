@@ -58,7 +58,7 @@ class KCarSpider(scrapy.Spider):
         toll = None
 
         try:
-            if car.get('prc') and car.get('prdcnYr') and car.get('engdispmnt'):
+            if car.get('prc') and car.get('prdcnYr') and details.get("engdispmnt"):
 
                 if car.get('fuelNm') in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용', '가솔린 하이브리드', '디젤 하이브리드']:
                     engine_type = 3
@@ -67,7 +67,7 @@ class KCarSpider(scrapy.Spider):
                 else:
                     engine_type = None
 
-                toll = calc_toll(int(car.get('prc')), int(car.get('prdcnYr')), int(car.get('engdispmnt')), 'korea', engine_type)
+                toll = calc_toll(int(car.get('prc')), int(car.get('prdcnYr')), int(details.get("engdispmnt")), 'korea', engine_type)
         except Exception as e:
             print('Ошибка в пошлине на сайте аукциона. ', e)
 

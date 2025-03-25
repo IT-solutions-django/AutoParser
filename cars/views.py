@@ -171,6 +171,7 @@ def get_filter_cars(request):
             "price": car.finish,
             "mileage": car.mileage,
             "auction": car.auction,
+            "toll": car.toll,
             "photo": list(car.photos.all())[4].url if car.auction == "kcar" and car.photos.count() > 4 else car.photos.first().url if car.photos.exists() else None
         }
         for car in paginated_cars
@@ -242,6 +243,7 @@ def get_car(request):
             "color": car_db.color,
             "body_type": car_db.body_type,
             "auction": car_db.auction,
+            "toll": car_db.toll,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 
