@@ -80,7 +80,7 @@ class BobaedreamSpider(scrapy.Spider):
                 else:
                     engine_type = None
 
-                toll = calc_toll(int(finish_toll), year, engine_volume, 'korea',
+                toll = calc_toll(int(finish_toll) * 1000, year, engine_volume, 'korea',
                                  engine_type)
         except Exception as e:
             print('Ошибка в пошлине на сайте аукциона. ', e)

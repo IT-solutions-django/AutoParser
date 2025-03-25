@@ -56,7 +56,7 @@ class MparkSpider(scrapy.Spider):
                 else:
                     engine_type = None
 
-                toll = calc_toll(int(car.get('demoAmt')), int(car.get('yyyy')), int(details.get("numCc")), 'korea',
+                toll = calc_toll(int(car.get('demoAmt') * 1000), int(car.get('yyyy')), int(details.get("numCc")), 'korea',
                                  engine_type)
         except Exception as e:
             print('Ошибка в пошлине на сайте аукциона. ', e)
