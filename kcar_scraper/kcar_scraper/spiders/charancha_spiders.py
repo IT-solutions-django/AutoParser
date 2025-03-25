@@ -27,8 +27,6 @@ class CharanchaSpider(scrapy.Spider):
         return {}
 
     def parse(self, response):
-        from cars.sub_fun import calc_toll
-
         root = ET.fromstring(response.text)
         car_list = root.findall(".//content")
 
@@ -36,29 +34,6 @@ class CharanchaSpider(scrapy.Spider):
             return
 
         for car in car_list:
-            finish_toll = car.find("sellPrice").text if car.find("sellPrice") is not None else None
-            year_toll = car.find("modelYyyyDt").text if car.find("modelYyyyDt") is not None else None
-            engine_volume_toll = car.find("displacement").text if car.find("displacement") is not None else None
-            engine_toll = car.find("fuelNm").text if car.find("fuelNm") is not None else None
-
-            toll = None
-
-            try:
-                if finish_toll and year_toll and engine_volume_toll:
-
-                    if engine_toll in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG',
-                                                 '수소+전기', '기타',
-                                                 '가솔린/LPG겸용', '가솔린 하이브리드', '디젤 하이브리드']:
-                        engine_type = 3
-                    elif engine_toll in ['전기']:
-                        engine_type = 2
-                    else:
-                        engine_type = None
-
-                    toll = calc_toll(int(finish_toll) * 1000, int(year_toll), int(engine_volume_toll), 'korea',
-                                     engine_type)
-            except Exception as e:
-                print('Ошибка в пошлине на сайте аукциона. ', e)
 
             yield KcarScraperItem(
                 api_id=car.find("sellNo").text if car.find("sellNo") is not None else None,
@@ -81,7 +56,7 @@ class CharanchaSpider(scrapy.Spider):
                 power_volume=None,
                 body_brand=None,
                 lot=None,
-                toll=toll,
+                toll=None,
                 auction="charancha"
             )
 
