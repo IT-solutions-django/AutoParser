@@ -9,6 +9,26 @@ import time
 import logging
 from .sub_fun import calc_toll
 
+import json
+from pathlib import Path
+
+
+def add_car_id_to_json(car_id):
+    json_file = Path("cars_ids.json")
+
+    if not json_file.exists():
+        with open(json_file, "w", encoding="utf-8") as f:
+            json.dump({"car_ids": []}, f, ensure_ascii=False, indent=4)
+
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if car_id not in data["car_ids"]:
+        data["car_ids"].append(car_id)
+
+    with open(json_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
 # Настройка логирования
 logging.basicConfig(
     filename='errors.log',       
@@ -227,6 +247,9 @@ def save_to_db(table, car, model, brand_country):
         else:
             car_obj.is_active = True
             car_obj.save()
+
+        add_car_id_to_json(car_obj.api_id)
+
     except Exception as e:
         print(e)
 
