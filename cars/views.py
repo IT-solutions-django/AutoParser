@@ -244,6 +244,7 @@ def get_car(request):
             "body_type": car_db.body_type,
             "auction": car_db.auction,
             "toll": car_db.toll,
+            "engine": car_db.engine,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 

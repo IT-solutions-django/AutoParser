@@ -2,6 +2,7 @@ from celery import shared_task
 import os
 import subprocess
 import logging
+from django.db import transaction
 
 
 @shared_task
@@ -43,6 +44,8 @@ def convert_in_toll(auction_value):
     from cars.sub_fun import calc_toll
     from cars.models import AucCars
 
+    BATCH_SIZE = 500
+
     cars_auction = AucCars.objects.filter(auction=auction_value).only('id', 'finish', 'year', 'engine_volume', 'engine')
     updated_cars = []
 
@@ -63,11 +66,17 @@ def convert_in_toll(auction_value):
                 car.toll = toll
                 updated_cars.append(car)
 
+            if len(updated_cars) >= BATCH_SIZE:
+                with transaction.atomic():
+                    AucCars.objects.bulk_update(updated_cars, ['toll'])
+                updated_cars.clear()
+
         except Exception as e:
             print('Ошибка в пошлине на сайте аукциона. ', e)
             continue
 
     if updated_cars:
-        AucCars.objects.bulk_update(updated_cars, ['toll'])
+        with transaction.atomic():
+            AucCars.objects.bulk_update(updated_cars, ['toll'])
 
 
