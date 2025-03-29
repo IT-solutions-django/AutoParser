@@ -159,11 +159,27 @@ def get_filter_cars(request):
     paginator = Paginator(cars, 16)
     paginated_cars = paginator.get_page(page)
 
+    brands_in_page = {car.brand for car in paginated_cars}
+
+    models_in_page = {car.model for car in paginated_cars}
+
+    brand_translations = {
+        t.brand: t.ru_brand
+        for t in RuBrandCar.objects.filter(brand__in=brands_in_page)
+    }
+
+    model_translations = {
+        t.model: t.ru_model
+        for t in RuModelCar.objects.filter(model__in=models_in_page)
+    }
+
     cars_list = [
         {
             "id": car.id,
             "brand": car.brand,
+            "ru_brand": brand_translations.get(car.brand, car.brand),
             "model": car.model,
+            "ru_model": model_translations.get(car.model, car.model),
             "drive": car.drive,
             "transmission": car.transmission,
             "engine_volume": car.engine_volume,
