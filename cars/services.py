@@ -308,7 +308,7 @@ def parse_charancha() -> None:
         current_page += 1
 
 
-API_KEY = "AQVN1Zdx8acTpDcE-dtFj34XU_bcD33f4L8hjFwR"
+API_KEY = "AQVN2HsU0I5W71AKDUpBpVPqxcBUEIfwBvSLT6Ua"
 URL = "https://translate.api.cloud.yandex.net/translate/v2/translate"
 
 
