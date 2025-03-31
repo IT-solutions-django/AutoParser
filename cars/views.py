@@ -25,23 +25,23 @@ class StartParsingView(View):
 class LoadMarksView(View):
     def get(self, request):
         CAR_BRANDS = [
-            ("Корея", ["SAMSUNG", "SSANGYONG", "GENESIS", "HUASONG", "HYUNDAI", "KIA"]),
+            ("Корея", ["SAMSUNG", "SSANGYONG", "GENESIS", "HUASONG", "HYUNDAI", "KIA", "기아", "쉐보레(GM대우)", "르노코리아(삼성)", "현대", "제네시스", "KG모빌리티(쌍용)", "대창모터스", "쉐보레(대우)", "기타 수입차", "GM대우", "KG모빌리티", "쌍용", "어울림모터스", "기타 국산차"]),
             ("Япония",
              ["TOYOTA", "NISSAN", "SUZUKI", "MITSUBISHI", "SUBARU", "HONDA", "DAIHATSU", "LEXUS", "ISUZU", "MAZDA",
-              "INFINITI", "ACURA", "SCION", "HINO"]),
+              "INFINITI", "ACURA", "SCION", "HINO", "도요타", "혼다", "닛산", "토요타", "인피니티", "렉서스", "스즈키", "스바루", "다이하쯔", "미쯔비시", "어큐라", "마쯔다", "다이하쓰", "미쓰비시", "미쯔오카"]),
             ("Китай",
              ["BAIC", "BAO JUN", "BESTURN", "BYD", "CHANGAN", "CHERY", "CIIMO", "DEEPAL", "DENZA", "DONGFENG", "EXEED",
               "FOTON", "GEELY AUTO", "GEOMETRY", "GREAT WALL", "HAMA", "HAVAL", "HIPHI", "HONGQI", "HYCAN", "IM", "JAC",
               "JETOUR", "JETTA", "JMC", "LANTU", "LEAPMOTOR", "LEOPAARD", "LI AUTO", "MAXUS", "NETA AUTO", "NIO", "ORA",
               "QOROS", "RISING AUTO", "REWE", "RUICHI", "SGMW", "SOL", "SOUEAST", "SWM", "TANK", "TRUMPCHI", "VENUCIA",
               "WELTMEISTER", "WEVAN", "WEY", "XPENG MOTORS", "ZEEKR", "ZHONGHUA", "ZOTYE", "ZXAUTO", "LUMMA", "OLEY",
-              "KAWEI", "SALEEN", "LINDWIND"]),
+              "KAWEI", "SALEEN", "LINDWIND", "세보모빌리티(캠시스)", "DFSK(동풍자동차)", "북기은상", "동풍소콘"]),
             ("Европа", ["MERCEDES BENZ", "BMW", "MINI", "VOLKSWAGEN", "AUDI", "CITROEN", "VOLVO", "SMART", "PORSCHE",
                         "LAND ROVER", "RENAULT", "ALFAROMEO", "FIAT", "ASTON MARTIN", "JAGUAR", "MG", "PEUGEOT",
                         "MASERATI", "LANCIA", "SAAB", "FERRARI", "ROVER", "BMW ALPINA", "LOTUS", "BENTLEY", "LINCOLN",
                         "TADANO", "TRIUMPH", "BORGWARD", "BRABUS", "BUICK", "CARLSSON", "DS", "HORKI", "KOENIGSEGG",
                         "LAMBORGHINI", "LEVC", "LUXGEN", "LYNK", "MANSORY", "MAYBACH", "MCLAREN", "MORGAN", "POLESTAR",
-                        "ROLLS ROYCE", "SEAT", "SKODA", "STARTECH", "IVECO", "ALPINA"]),
+                        "ROLLS ROYCE", "SEAT", "SKODA", "STARTECH", "IVECO", "ALPINA", "미니", "폭스바겐", "아우디", "푸조", "포르쉐", "볼보", "벤츠", "포드", "쉐보레", "마세라티", "닷지", "랜드로버", "벤틀리", "폴스타", "람보르기니", "스마트", "캐딜락", "시트로엥", "베일리", "링컨", "재규어", "르노(삼성)", "지프", "피아트", "페라리", "크라이슬러", "카라도", "애스턴마틴", "험머", "사브", "롤스로이스", "맥라렌", "시트로엥/DS", "테슬라", "GMC", "DS", "올즈모빌", "로버", "로터스", "르노삼성", "르노코리아", "마이바흐", "부가티", "알핀", "허머", "알파로메오"]),
         ]
         for country, brands in CAR_BRANDS:
             for brand in brands:
@@ -117,6 +117,8 @@ def get_filter_cars(request):
     color = request.GET.get('color')
     color_list = color.split(',') if color else []
 
+    country_str = request.GET.get('country')
+
     page = int(request.GET.get('page', 1))
 
     param_filter = Q()
@@ -153,6 +155,8 @@ def get_filter_cars(request):
         param_filter &= Q(mileage__gte=mileage_from)
     if mileage_to:
         param_filter &= Q(mileage__lte=mileage_to)
+    if country_str:
+        param_filter &= Q(brand_country__country=country_str)
 
     cars = AucCars.objects.filter(param_filter).prefetch_related("photos")
 
@@ -204,7 +208,11 @@ def get_brands(request):
     if not ip_addr or ip_addr != '94.241.142.204':
         return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
 
-    brands_car = RuBrandCar.objects.values_list('brand', 'ru_brand')
+    country_q = request.GET.get('country')
+
+    brand_country = CountryModels.objects.filter(country=country_q).values_list('brand', flat=True)
+
+    brands_car = RuBrandCar.objects.filter(brand__in=brand_country).values_list('brand', 'ru_brand')
 
     data_brand = list(brands_car)
 
@@ -239,6 +247,20 @@ def get_models_all(request):
     return JsonResponse(list(models_queryset), safe=False, json_dumps_params={"ensure_ascii": False})
 
 
+def get_popular_cars(params):
+    url = "http://193.164.149.51/cars/get-cars"
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        data, total_pages, curr_page = response.json()['cars']
+        return data
+
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при запросе к API: {e}")
+        return []
+
+
 def get_car(request):
     ip_addr = request.GET.get('ip')
     if not ip_addr or ip_addr != '94.241.142.204':
@@ -247,9 +269,22 @@ def get_car(request):
     if request.GET.get('id'):
         car_db = AucCars.objects.prefetch_related("photos").get(id=request.GET.get('id'))
 
+        brand_translate = RuBrandCar.objects.filter(brand=car_db.brand).first()
+
+        model_translate = RuModelCar.objects.filter(model=car_db.model).first()
+
+        params = {
+            'ip': '94.241.142.204',
+            'brand': car_db.brand
+        }
+
+        popular_cars = get_popular_cars(params)[:8]
+
         car = {
             "brand": car_db.brand,
+            "ru_brand": brand_translate.ru_brand if brand_translate else car_db.brand,
             "model": car_db.model,
+            "ru_model": model_translate.ru_model if model_translate else car_db.model,
             "drive": car_db.drive,
             "transmission": car_db.transmission,
             "engine_volume": car_db.engine_volume,
@@ -265,13 +300,13 @@ def get_car(request):
         }
 
         return JsonResponse(
-            {"car": car},
+            {"car": car, "popular_cars": popular_cars},
             json_dumps_params={"ensure_ascii": False},
         )
 
     else:
         return JsonResponse(
-            {"car": []},
+            {"car": [], "popular_cars": []},
             json_dumps_params={"ensure_ascii": False},
         )
 
