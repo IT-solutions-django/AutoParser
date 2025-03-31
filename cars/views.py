@@ -247,18 +247,44 @@ def get_models_all(request):
     return JsonResponse(list(models_queryset), safe=False, json_dumps_params={"ensure_ascii": False})
 
 
-def get_popular_cars(params):
-    url = "http://193.164.149.51/cars/get-cars"
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
+def get_popular_cars(brand):
+    cars = AucCars.objects.filter(brand=brand).prefetch_related("photos")[:8]
 
-        data, total_pages, curr_page = response.json()['cars']
-        return data
+    brands_in_page = {car.brand for car in cars}
 
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка при запросе к API: {e}")
-        return []
+    models_in_page = {car.model for car in cars}
+
+    brand_translations = {
+        t.brand: t.ru_brand
+        for t in RuBrandCar.objects.filter(brand__in=brands_in_page)
+    }
+
+    model_translations = {
+        t.model: t.ru_model
+        for t in RuModelCar.objects.filter(model__in=models_in_page)
+    }
+
+    popular_cars = [
+        {
+            "id": car.id,
+            "brand": car.brand,
+            "ru_brand": brand_translations.get(car.brand, car.brand),
+            "model": car.model,
+            "ru_model": model_translations.get(car.model, car.model),
+            "drive": car.drive,
+            "transmission": car.transmission,
+            "engine_volume": car.engine_volume,
+            "year": car.year,
+            "price": car.finish,
+            "mileage": car.mileage,
+            "auction": car.auction,
+            "toll": car.toll,
+            "photo": list(car.photos.all())[4].url if car.auction == "kcar" and car.photos.count() > 4 else car.photos.first().url if car.photos.exists() else None
+        }
+        for car in cars
+    ]
+
+    return popular_cars
 
 
 def get_car(request):
@@ -267,18 +293,13 @@ def get_car(request):
         return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
 
     if request.GET.get('id'):
-        car_db = AucCars.objects.prefetch_related("photos").get(id=request.GET.get('id'))
+        car_db = AucCars.objects.prefetch_related("photos").select_related("brand_country").get(id=request.GET.get('id'))
 
         brand_translate = RuBrandCar.objects.filter(brand=car_db.brand).first()
 
         model_translate = RuModelCar.objects.filter(model=car_db.model).first()
 
-        params = {
-            'ip': '94.241.142.204',
-            'brand': car_db.brand
-        }
-
-        popular_cars = get_popular_cars(params)[:8]
+        popular_cars = get_popular_cars(car_db.brand)
 
         car = {
             "brand": car_db.brand,
@@ -296,6 +317,7 @@ def get_car(request):
             "auction": car_db.auction,
             "toll": car_db.toll,
             "engine": car_db.engine,
+            "country": car_db.brand_country.country,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 
