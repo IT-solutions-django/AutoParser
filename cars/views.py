@@ -13,6 +13,7 @@ from .models import AucCars
 from .auc_parser import *
 from .services import parse_kcar, translate_and_save
 from django.core.paginator import Paginator
+from cars.sub_fun_2 import calc_price
 
 
 class StartParsingView(View):
@@ -148,9 +149,9 @@ def get_filter_cars(request):
     if year_to:
         param_filter &= Q(year__lte=year_to)
     if price_from:
-        param_filter &= Q(finish__gte=price_from)
+        param_filter &= Q(toll__gte=price_from)
     if price_to:
-        param_filter &= Q(finish__lte=price_to)
+        param_filter &= Q(toll__lte=price_to)
     if mileage_from:
         param_filter &= Q(mileage__gte=mileage_from)
     if mileage_to:
@@ -279,12 +280,40 @@ def get_popular_cars(brand):
             "mileage": car.mileage,
             "auction": car.auction,
             "toll": car.toll,
-            "photo": list(car.photos.all())[4].url if car.auction == "kcar" and car.photos.count() > 4 else car.photos.first().url if car.photos.exists() else None
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url), None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
         }
         for car in cars
     ]
 
     return popular_cars
+
+
+def get_detailed_calculation(finish, year, eng_v, table, engine):
+    try:
+
+        if engine and engine in ['전기']:
+            detailed_calculation = {}
+
+        elif engine and engine in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용',
+                              '가솔린 하이브리드', '디젤 하이브리드']:
+            if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
+                detailed_calculation = calc_price(int(finish) * 1000, int(year), int(eng_v), table, 3)
+            else:
+                detailed_calculation = {}
+
+        elif engine:
+            if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
+                detailed_calculation = calc_price(int(finish) * 1000, int(year), int(eng_v), table)
+            else:
+                detailed_calculation = {}
+
+        else:
+            detailed_calculation = {}
+
+    except Exception as e:
+        detailed_calculation = {}
+
+    return detailed_calculation
 
 
 def get_car(request):
@@ -300,6 +329,8 @@ def get_car(request):
         model_translate = RuModelCar.objects.filter(model=car_db.model).first()
 
         popular_cars = get_popular_cars(car_db.brand)
+
+        detailed_calculation = get_detailed_calculation(car_db.finish, car_db.year, car_db.engine_volume, 'korea', car_db.engine)
 
         car = {
             "brand": car_db.brand,
@@ -322,13 +353,13 @@ def get_car(request):
         }
 
         return JsonResponse(
-            {"car": car, "popular_cars": popular_cars},
+            {"car": car, "popular_cars": popular_cars, 'detailed_calculation': detailed_calculation},
             json_dumps_params={"ensure_ascii": False},
         )
 
     else:
         return JsonResponse(
-            {"car": [], "popular_cars": []},
+            {"car": [], "popular_cars": [], 'detailed_calculation': []},
             json_dumps_params={"ensure_ascii": False},
         )
 
