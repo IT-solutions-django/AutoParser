@@ -24,14 +24,14 @@ def save_car_data(item):
             elif item["engine"] and item["engine"] in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용',
                               '가솔린 하이브리드', '디젤 하이브리드']:
                 if item["finish"] and item["finish"] not in ['0', 0] and item["year"] and item["year"] not in [0, '0'] and item["engine_volume"] and item["engine_volume"] not in ['0', 0]:
-                    detailed_calculation = calc_price(int(item["finish"]) * 1000, int(item["year"]), int(item["engine_volume"]), 'korea', 3)
+                    detailed_calculation = calc_price(int(item["finish"]) * 10000, int(item["year"]), int(item["engine_volume"]), 'korea', 3)
                     toll = detailed_calculation['total']
                 else:
                     toll = -1
 
             elif item["engine"]:
                 if item["finish"] and item["finish"] not in ['0', 0] and item["year"] and item["year"] not in [0, '0'] and item["engine_volume"] and item["engine_volume"] not in ['0', 0]:
-                    detailed_calculation = calc_price(int(item["finish"]) * 1000, int(item["year"]), int(item["engine_volume"]), 'korea')
+                    detailed_calculation = calc_price(int(item["finish"]) * 10000, int(item["year"]), int(item["engine_volume"]), 'korea')
                     toll = detailed_calculation['total']
                 else:
                     toll = -1

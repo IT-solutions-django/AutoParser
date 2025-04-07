@@ -8,6 +8,7 @@ from random import randint
 import time
 import logging
 from .sub_fun import calc_toll
+from .sub_fun_2 import calc_price, get_akz
 
 import json
 from pathlib import Path
@@ -199,8 +200,17 @@ def save_to_db(table, car, model, brand_country):
         if not car.get('YEAR'):
             print('Года нет') 
             return
-        
-        toll = calc_toll(car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type) 
+
+        if engine_type == 2:
+            detailed_calculation = calc_price(car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type)
+
+            power = int(car["PW"]) if car.get("PW") else 0
+            akz = get_akz(power, car["ENG_V"])
+            nds = (detailed_calculation["car_price_rus"] + detailed_calculation["toll"] + akz) * 0.2
+
+            toll = detailed_calculation["total"] + akz + nds
+        else:
+            toll = calc_price(car["FINISH"], car["YEAR"], car["ENG_V"], table, engine_type)['total']
         print(toll)
         
         car_obj, created = model.objects.get_or_create(
