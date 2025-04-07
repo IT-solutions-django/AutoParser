@@ -13,7 +13,7 @@ from .models import AucCars
 from .auc_parser import *
 from .services import parse_kcar, translate_and_save
 from django.core.paginator import Paginator
-from cars.sub_fun_2 import calc_price
+from cars.sub_fun_2 import calc_price, get_akz
 
 
 class StartParsingView(View):
@@ -193,7 +193,7 @@ def get_filter_cars(request):
             "mileage": car.mileage,
             "auction": car.auction,
             "toll": car.toll,
-            "photo": list(car.photos.all())[4].url if car.auction == "kcar" and car.photos.count() > 4 else car.photos.first().url if car.photos.exists() else None
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url), None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
         }
         for car in paginated_cars
     ]
@@ -297,13 +297,60 @@ def get_detailed_calculation(finish, year, eng_v, table, engine):
         elif engine and engine in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용',
                               '가솔린 하이브리드', '디젤 하이브리드']:
             if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
-                detailed_calculation = calc_price(int(finish) * 1000, int(year), int(eng_v), table, 3)
+                detailed_calculation = calc_price(int(finish) * 10000, int(year), int(eng_v), table, 3)
             else:
                 detailed_calculation = {}
 
         elif engine:
             if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
-                detailed_calculation = calc_price(int(finish) * 1000, int(year), int(eng_v), table)
+                detailed_calculation = calc_price(int(finish) * 10000, int(year), int(eng_v), table)
+            else:
+                detailed_calculation = {}
+
+        else:
+            detailed_calculation = {}
+
+    except Exception as e:
+        detailed_calculation = {}
+
+    return detailed_calculation
+
+
+def get_detailed_calculation_encar(finish, year, eng_v, table, engine, power):
+    try:
+
+        akz = 0
+        nds = 0
+
+        if engine and engine in ['Электро']:
+            if finish not in [0,
+                              '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [
+                0, '0']:
+                detailed_calculation = calc_price(int(finish), int(year), int(eng_v), table, 2)
+                akz = get_akz(power, eng_v)
+                nds = (detailed_calculation["car_price_rus"] + detailed_calculation["toll"] + akz) * 0.2
+                detailed_calculation["total"] = detailed_calculation["total"] + akz + nds
+
+                detailed_calculation["nds"] = nds
+                detailed_calculation["akz"] = akz
+            else:
+                detailed_calculation = {}
+
+        elif engine and engine in ['Гибрид']:
+            if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
+                detailed_calculation = calc_price(int(finish), int(year), int(eng_v), table, 3)
+
+                detailed_calculation["nds"] = nds
+                detailed_calculation["akz"] = akz
+            else:
+                detailed_calculation = {}
+
+        elif engine:
+            if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
+                detailed_calculation = calc_price(int(finish), int(year), int(eng_v), table)
+
+                detailed_calculation["nds"] = nds
+                detailed_calculation["akz"] = akz
             else:
                 detailed_calculation = {}
 
@@ -330,7 +377,11 @@ def get_car(request):
 
         popular_cars = get_popular_cars(car_db.brand)
 
-        detailed_calculation = get_detailed_calculation(car_db.finish, car_db.year, car_db.engine_volume, 'korea', car_db.engine)
+        if car_db.auction != 'encar':
+            detailed_calculation = get_detailed_calculation(car_db.finish, car_db.year, car_db.engine_volume, 'korea', car_db.engine)
+        else:
+            detailed_calculation = get_detailed_calculation_encar(car_db.finish, car_db.year, car_db.engine_volume, 'korea',
+                                                            car_db.engine, car_db.power_volume)
 
         car = {
             "brand": car_db.brand,
