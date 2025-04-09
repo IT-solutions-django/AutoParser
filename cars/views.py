@@ -122,6 +122,8 @@ def get_filter_cars(request):
 
     page = int(request.GET.get('page', 1))
 
+    order = request.GET.get('order')
+
     param_filter = Q()
 
     if brand_list:
@@ -160,6 +162,20 @@ def get_filter_cars(request):
         param_filter &= Q(brand_country__country=country_str)
 
     cars = AucCars.objects.filter(param_filter).prefetch_related("photos")
+
+    if order:
+        if order == "price_increase":
+            cars = cars.order_by("toll")
+        elif order == "price_decreasing":
+            cars = cars.order_by("-toll")
+        elif order == "year_increase":
+            cars = cars.order_by("year")
+        elif order == "year_decreasing":
+            cars = cars.order_by("-year")
+        elif order == "mileage_increase":
+            cars = cars.order_by("mileage")
+        elif order == "mileage_decreasing":
+            cars = cars.order_by("-mileage")
 
     paginator = Paginator(cars, 16)
     paginated_cars = paginator.get_page(page)
@@ -439,5 +455,100 @@ def get_ru_model(request):
 
     return JsonResponse(
         {"ru_model": ru_model},
+        json_dumps_params={"ensure_ascii": False},
+    )
+
+
+def get_main_cars(request):
+    ip_addr = request.GET.get('ip')
+    if not ip_addr or ip_addr != '94.241.142.204':
+        return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    main_cars_korea = AucCars.objects.filter(auction='encar', brand_country__country='Корея')[:8]
+
+    popular_cars_korea = [
+        {
+            "id": car.id,
+            "brand": car.brand,
+            "model": car.model,
+            "drive": car.drive,
+            "transmission": car.transmission,
+            "engine_volume": car.engine_volume,
+            "year": car.year,
+            "price": car.finish,
+            "mileage": car.mileage,
+            "auction": car.auction,
+            "toll": car.toll,
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url),
+                          None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
+        }
+        for car in main_cars_korea
+    ]
+
+    main_cars_japan = AucCars.objects.filter(auction='encar', brand_country__country='Япония')[:8]
+
+    popular_cars_japan = [
+        {
+            "id": car.id,
+            "brand": car.brand,
+            "model": car.model,
+            "drive": car.drive,
+            "transmission": car.transmission,
+            "engine_volume": car.engine_volume,
+            "year": car.year,
+            "price": car.finish,
+            "mileage": car.mileage,
+            "auction": car.auction,
+            "toll": car.toll,
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url),
+                          None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
+        }
+        for car in main_cars_japan
+    ]
+
+    main_cars_china = AucCars.objects.filter(auction='encar', brand_country__country='Китай')[:8]
+
+    popular_cars_china = [
+        {
+            "id": car.id,
+            "brand": car.brand,
+            "model": car.model,
+            "drive": car.drive,
+            "transmission": car.transmission,
+            "engine_volume": car.engine_volume,
+            "year": car.year,
+            "price": car.finish,
+            "mileage": car.mileage,
+            "auction": car.auction,
+            "toll": car.toll,
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url),
+                          None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
+        }
+        for car in main_cars_china
+    ]
+
+    main_cars_europe = AucCars.objects.filter(auction='encar', brand_country__country='Европа')[:8]
+
+    popular_cars_europe = [
+        {
+            "id": car.id,
+            "brand": car.brand,
+            "model": car.model,
+            "drive": car.drive,
+            "transmission": car.transmission,
+            "engine_volume": car.engine_volume,
+            "year": car.year,
+            "price": car.finish,
+            "mileage": car.mileage,
+            "auction": car.auction,
+            "toll": car.toll,
+            "photo": next((photo.url for photo in car.photos.all() if "carpicture" in photo.url),
+                          None) if car.auction == "kcar" else car.photos.first().url if car.photos.exists() else None
+        }
+        for car in main_cars_europe
+    ]
+
+    return JsonResponse(
+        {"popular_cars_korea": popular_cars_korea, "popular_cars_japan": popular_cars_japan, "popular_cars_china": popular_cars_china, "popular_cars_europe": popular_cars_europe},
         json_dumps_params={"ensure_ascii": False},
     )

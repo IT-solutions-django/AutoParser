@@ -51,6 +51,7 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
         year = int(year)
         commision_sanctions_ = 0
         insurance_rus = 0
+        yts = 0
 
         # Перевод цены в рубли
         if table == 'main' or table == 'stats':
@@ -176,7 +177,7 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
         res_rus = toll + (delivery * one_rub) + our_commision + broker + insurance_rus + tof + yts
 
         result = {
-            'total': round((toll + price_rus) / 1000) * 1000,
+            'total': round((res_rus + price_rus) / 1000) * 1000,
             'toll': toll,
             'yts': yts,
             'tof': tof,
@@ -187,6 +188,8 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
             'delivery_rus': delivery * one_rub,
             'commision_sanctions_rus': commision_sanctions_,
             'commision_sanctions_rus': commision_sanctions_ * one_rub,
+            'our_commision': our_commision,
+            'broker': broker,
             'currency': currency
         }
 
