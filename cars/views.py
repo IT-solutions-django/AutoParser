@@ -416,6 +416,10 @@ def get_car(request):
             "toll": car_db.toll,
             "engine": car_db.engine,
             "country": car_db.brand_country.country,
+            "power_volume": car_db.power_volume,
+            "grade": car_db.grade,
+            "rate": car_db.rate,
+            "body_brand": car_db.body_brand,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 
