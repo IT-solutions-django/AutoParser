@@ -14,6 +14,7 @@ from .auc_parser import *
 from .services import parse_kcar, translate_and_save
 from django.core.paginator import Paginator
 from cars.sub_fun_2 import calc_price, get_akz
+from django.db.models import Case, When, Value, IntegerField
 
 
 class StartParsingView(View):
@@ -163,19 +164,29 @@ def get_filter_cars(request):
 
     cars = AucCars.objects.filter(param_filter).prefetch_related("photos")
 
+    cars = cars.annotate(
+        toll_priority=Case(
+            When(toll=-1, then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField()
+        )
+    )
+
     if order:
         if order == "price_increase":
-            cars = cars.order_by("toll")
+            cars = cars.order_by("toll_priority", "toll")
         elif order == "price_decreasing":
-            cars = cars.order_by("-toll")
+            cars = cars.order_by("toll_priority", "-toll")
         elif order == "year_increase":
-            cars = cars.order_by("year")
+            cars = cars.order_by("toll_priority", "year")
         elif order == "year_decreasing":
-            cars = cars.order_by("-year")
+            cars = cars.order_by("toll_priority", "-year")
         elif order == "mileage_increase":
-            cars = cars.order_by("mileage")
+            cars = cars.order_by("toll_priority", "mileage")
         elif order == "mileage_decreasing":
-            cars = cars.order_by("-mileage")
+            cars = cars.order_by("toll_priority", "-mileage")
+    else:
+        cars = cars.order_by("toll_priority")
 
     paginator = Paginator(cars, 16)
     paginated_cars = paginator.get_page(page)
@@ -399,6 +410,11 @@ def get_car(request):
             detailed_calculation = get_detailed_calculation_encar(car_db.finish, car_db.year, car_db.engine_volume, 'korea',
                                                             car_db.engine, car_db.power_volume)
 
+        if '(rental car)' in car_db.grade:
+            grade = car_db.grade.replace('(rental car)', '')
+        else:
+            grade = car_db.grade
+
         car = {
             "brand": car_db.brand,
             "ru_brand": brand_translate.ru_brand if brand_translate else car_db.brand,
@@ -417,7 +433,7 @@ def get_car(request):
             "engine": car_db.engine,
             "country": car_db.brand_country.country,
             "power_volume": car_db.power_volume,
-            "grade": car_db.grade,
+            "grade": grade,
             "rate": car_db.rate,
             "body_brand": car_db.body_brand,
             "photos": list(car_db.photos.values_list("url", flat=True))
