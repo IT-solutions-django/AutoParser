@@ -35,6 +35,8 @@ services:
     volumes:
       - './nginx.conf:/etc/nginx/nginx.conf'
       - './static:/var/www/static' 
+      - '../../etc/letsencrypt/live/car-auto.space/:/etc/ssl/live'
+      - '../../etc/letsencrypt/archive/car-auto.space/:/etc/ssl/archive'
     depends_on:
       - backend 
       - redis
