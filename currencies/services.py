@@ -53,7 +53,10 @@ def update_all_currencies_from_central_bank() -> None:
 
     soup = BeautifulSoup(html, 'lxml') 
 
-    currencies = Currency.objects.all()
+    with open('file.html', 'w', encoding='utf-8') as file: 
+        file.write(str(soup))
+
+    currencies = Currency.get_all_except_crypto()
     for currency in currencies:
         tr_element = soup.find(lambda tag: tag.name == "tr" and tag.find("td", string=currency.name))
         _, curr_code, quantity, _, exchange_rate_raw = map(lambda x: x.text, tr_element.find_all('td'))

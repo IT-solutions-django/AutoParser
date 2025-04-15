@@ -80,3 +80,7 @@ class Currency(models.Model):
     @staticmethod
     def get_krw_crypto() -> 'Currency':
         return Currency.objects.filter(name='KRW_crypto').first()
+    
+    @staticmethod 
+    def get_all_except_crypto(): 
+        return Currency.objects.exclude(name__endswith='_crypto')

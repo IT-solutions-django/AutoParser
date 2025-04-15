@@ -201,7 +201,6 @@ bot = telebot.TeleBot(bot_token)
 
 
 def start_bot():
-    print('Бот запускается...')
     bot.remove_webhook()  
     bot.set_webhook(url="https://car-auto.space/bot/")
 
