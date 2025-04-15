@@ -15,15 +15,15 @@ services:
   postgres:
     image: postgres:15-alpine
     restart: always
-    command: postgres -p 5439
+    # command: postgres -p 5439
     environment:
       POSTGRES_DB: cars
       POSTGRES_USER: root
       POSTGRES_PASSWORD: adminroot
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5439:5439"
+    # ports:
+    #   - "5439:5439"
     networks:
       - dev
 
