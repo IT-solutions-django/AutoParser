@@ -203,7 +203,7 @@ bot = telebot.TeleBot(bot_token)
 def start_bot():
     print('Бот запускается...')
     bot.remove_webhook()  
-    bot.set_webhook(url="http://193.164.149.51/bot/")
+    bot.set_webhook(url="https://car-auto.space/bot/")
 
 
 @csrf_exempt
