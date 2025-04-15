@@ -19,7 +19,7 @@ from django.urls import path, include
 from cars.views import *
 from django.conf import settings
 from django.conf.urls.static import static
-
+from currencies.views import webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +27,7 @@ urlpatterns = [
 
     path('cars/', include('cars.urls', namespace='cars')),
     path('currencies/', include('currencies.urls', namespace='currencies')),
+
+    path('bot/', webhook),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

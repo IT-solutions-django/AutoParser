@@ -11,6 +11,8 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic --noinput
 
+python currencies/bot_runner.py
+
 celery -A core worker -l info -P prefork &
 celery -A core beat -l info &
 celery -A core flower -l info &
