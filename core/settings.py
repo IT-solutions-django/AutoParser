@@ -82,30 +82,30 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cars',
-        'USER': 'root',
-        'PASSWORD': 'adminroot',
-        'HOST': 'postgres',
-        'PORT': '5432',
-    }
-}
-
-
-# Для локальной разработки 
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'cars',
 #         'USER': 'root',
 #         'PASSWORD': 'adminroot',
-#         'HOST': '127.0.0.1',
+#         'HOST': 'postgres',
 #         'PORT': '5432',
 #     }
 # }
+
+
+# Для локальной разработки 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'cars',
+        'USER': 'root',
+        'PASSWORD': 'adminroot',
+        'HOST': '127.0.0.1',
+        'PORT': '5439',
+    }
+}
 
 
 # Password validation
