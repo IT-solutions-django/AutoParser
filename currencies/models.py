@@ -37,6 +37,11 @@ class Currency(models.Model):
         verbose_name='Курс по ТКС'
     )
 
+    exchange_rate_batareyka = models.FloatField(
+        default=0.0, 
+        verbose_name='Курс по батарейке'
+    )
+
     updated_at = models.DateTimeField(
         auto_now=True
     )
@@ -63,3 +68,15 @@ class Currency(models.Model):
     @staticmethod
     def get_eur() -> 'Currency': 
         return Currency.objects.filter(name='EUR').first()
+    
+    @staticmethod
+    def get_jpy_crypto() -> 'Currency':
+        return Currency.objects.filter(name='JPY_crypto').first()
+    
+    @staticmethod
+    def get_cny_crypto() -> 'Currency':
+        return Currency.objects.filter(name='CNY_crypto').first()
+    
+    @staticmethod
+    def get_krw_crypto() -> 'Currency':
+        return Currency.objects.filter(name='KRW_crypto').first()

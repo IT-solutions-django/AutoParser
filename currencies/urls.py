@@ -16,5 +16,6 @@ urlpatterns = [
 
     path('get-exchange-rates/', GetExchangeRatesView.as_view(), name='get_exchange_rates'),
     path('get-exchange-rates-from-cbr/', GetExchangeRatesFromCbrView.as_view(), name='get_exchange_rates_from_cbr'),
-    path('get-exchange-rates-from-tks/', GetExchangeRatesFromTksView.as_view(), name='get_exchange_rates_from_tks'),
+    path('get-exchange-rates-from-tks/', GetExchangeRatesFromBatareykaView.as_view(), name='get_exchange_rates_from_tks'),
+    path('get-exchange-rates-from-batareyka/', GetExchangeRatesFromBatareykaView.as_view(), name='get_exchange_rates_from_batareyka'),
 ] 
