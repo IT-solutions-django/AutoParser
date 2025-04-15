@@ -29,7 +29,6 @@ def post_process():
 
     translate_and_save("RuBrandCar", "brand", "ru_brand")
     translate_and_save("RuModelCar", "model", "ru_model")
-    translate_and_save("RuColorCar", "color", "ru_color", target_language='ru')
 
 
 def clear_database(auction_value):
