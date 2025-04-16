@@ -410,10 +410,13 @@ def get_car(request):
             detailed_calculation = get_detailed_calculation_encar(car_db.finish, car_db.year, car_db.engine_volume, 'korea',
                                                             car_db.engine, car_db.power_volume)
 
-        if '(rental car)' in car_db.grade:
-            grade = car_db.grade.replace('(rental car)', '')
+        if car_db.grade:
+            if '(rental car)' in car_db.grade:
+                grade = car_db.grade.replace('(rental car)', '')
+            else:
+                grade = car_db.grade
         else:
-            grade = car_db.grade
+            grade = None
 
         car = {
             "brand": car_db.brand,
