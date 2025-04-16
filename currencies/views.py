@@ -112,7 +112,7 @@ class GetExchangeRatesFromCbrView(View):
         return JsonResponse(data)
     
 
-class GetExchangeRatesFromBatareykaView(View): 
+class GetExchangeRatesFromTksView(View): 
     def get(self, request): 
         jpy = Currency.get_jpy() 
         cny = Currency.get_cny() 
