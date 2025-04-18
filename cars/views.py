@@ -439,6 +439,7 @@ def get_car(request):
             "grade": grade,
             "rate": car_db.rate,
             "body_brand": car_db.body_brand,
+            "api_id": car_db.api_id,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 
@@ -575,3 +576,51 @@ def get_main_cars(request):
         {"popular_cars_korea": popular_cars_korea, "popular_cars_japan": popular_cars_japan, "popular_cars_china": popular_cars_china, "popular_cars_europe": popular_cars_europe},
         json_dumps_params={"ensure_ascii": False},
     )
+
+
+def api_calculation_price_car(request):
+    ip_addr = request.GET.get('ip')
+    if not ip_addr or ip_addr != '94.241.142.204':
+        return JsonResponse({'error': "Forbidden: Invalid IP from X-Real-IP"}, status=403)
+
+    try:
+
+        akz = 0
+        nds = 0
+
+        current_year = int(datetime.now().year)
+
+        year = current_year - int(request.GET.get('year'))
+
+        if request.GET.get('engine') and request.GET.get('engine') in ['Электро']:
+
+            detailed_calculation = calc_price(int(request.GET.get('price')), int(year), int(request.GET.get('eng_v')), 'korea', 2)
+            akz = get_akz(int(request.GET.get('power')), int(request.GET.get('eng_v')))
+            nds = (detailed_calculation["car_price_rus"] + detailed_calculation["toll"] + akz) * 0.2
+            detailed_calculation["total"] = detailed_calculation["total"] + akz + nds
+
+            detailed_calculation["nds"] = nds
+            detailed_calculation["akz"] = akz
+
+        elif request.GET.get('engine') and request.GET.get('engine') in ['Гибрид']:
+
+            detailed_calculation = calc_price(int(request.GET.get('price')), int(year), int(request.GET.get('eng_v')), 'korea', 3)
+
+            detailed_calculation["nds"] = nds
+            detailed_calculation["akz"] = akz
+
+        elif request.GET.get('engine'):
+
+            detailed_calculation = calc_price(int(request.GET.get('price')), int(year), int(request.GET.get('eng_v')), 'korea')
+
+            detailed_calculation["nds"] = nds
+            detailed_calculation["akz"] = akz
+
+        else:
+            detailed_calculation = {}
+
+    except Exception as e:
+        detailed_calculation = {}
+
+    return JsonResponse({'detailed_calculation': detailed_calculation}, status=200)
+
