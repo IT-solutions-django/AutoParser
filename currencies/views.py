@@ -154,18 +154,34 @@ class GetExchangeRatesFromBatareykaView(View):
         krw_crypto = Currency.get_krw_crypto()
         eur = Currency.get_eur()
         data = {
+            'JPY': {
+                'exchange_rate': jpy.exchange_rate_batareyka, 
+                'updated_at': jpy.updated_at,
+            },
             'JPY_crypto': {
                 'exchange_rate': jpy_crypto.exchange_rate_batareyka, 
                 'updated_at': jpy_crypto.updated_at,
+            },
+            'CNY': {
+                'exchange_rate': cny.exchange_rate_batareyka, 
+                'updated_at': cny.updated_at,
             },
             'CNY_crypto': {
                 'exchange_rate': cny_crypto.exchange_rate_batareyka, 
                 'updated_at': cny_crypto.updated_at,
             },
+            'KRW': {
+                'exchange_rate': krw.exchange_rate_batareyka, 
+                'updated_at': krw.updated_at,
+            },
             'KRW_crypto': {
                 'exchange_rate': krw_crypto.exchange_rate_batareyka, 
                 'updated_at': krw_crypto.updated_at,
             },
+            'EUR': {
+                'exchange_rate': eur.exchange_rate_batareyka, 
+                'updated_at': eur.updated_at,
+            }, 
         }
         return JsonResponse(data)
     
