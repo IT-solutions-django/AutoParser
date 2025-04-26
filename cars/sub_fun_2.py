@@ -171,7 +171,7 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
         else:
             toll = duty * currency["EUR"]
 
-        if age <= 3:
+        if age < 3:
             if engine_type == 2:
                 yts = 20000 * 0.17
             elif volume <= 1000:
