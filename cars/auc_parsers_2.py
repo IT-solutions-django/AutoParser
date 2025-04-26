@@ -7,7 +7,7 @@ from random import randint
 
 def fetch_card_car(api_id, drive, rate):
     try:
-        url = f'http://31.130.151.223/api/get-auc-tables-data/korea/{api_id}/'
+        url = f'http://31.130.151.223/api/get-auc-tables-data/korea/{api_id}'
 
         params = {
             'ip': '193.164.149.51'
