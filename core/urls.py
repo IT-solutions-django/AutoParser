@@ -23,7 +23,8 @@ from currencies.views import webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('start-parsing/', StartParsingView.as_view(), name='start_parsing'), 
+    path('start-parsing/', StartParsingView.as_view(), name='start_parsing'),
+    path('start-encar/', StartEncarView.as_view(), name='start_encar'),
 
     path('cars/', include('cars.urls', namespace='cars')),
     path('currencies/', include('currencies.urls', namespace='currencies')),

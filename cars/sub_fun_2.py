@@ -13,11 +13,11 @@ logging.basicConfig(
 def get_currency():
     currency = {}
 
-    currency['JPY'] = float(Currency.get_jpy().exchange_rate)
-    currency['CNY'] = float(Currency.get_cny().exchange_rate)
-    currency['USD'] = float(Currency.get_usd().exchange_rate)
-    currency['EUR'] = float(Currency.get_eur().exchange_rate)
-    currency['KRW'] = float(Currency.get_krw().exchange_rate)
+    currency['JPY'] = float(Currency.get_jpy().exchange_rate_batareyka)
+    currency['CNY'] = float(Currency.get_cny().exchange_rate_batareyka)
+    currency['USD'] = float(Currency.get_usd().exchange_rate_batareyka)
+    currency['EUR'] = float(Currency.get_eur().exchange_rate_batareyka)
+    currency['KRW'] = float(Currency.get_krw().exchange_rate_batareyka)
 
     return currency
 

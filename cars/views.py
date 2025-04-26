@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import CountryModels
-from .tasks import update_korea
+from .tasks import update_korea, update_encar
 from .auc_parser import parse_korea
 from rest_framework import generics
 from itertools import chain
@@ -21,6 +21,12 @@ class StartParsingView(View):
     def get(self, request):
         update_korea.delay()
         # update_korea()
+        return HttpResponse("Парсер запущен!", status=200)
+
+
+class StartEncarView(View):
+    def get(self, request):
+        update_encar.delay()
         return HttpResponse("Парсер запущен!", status=200)
 
 

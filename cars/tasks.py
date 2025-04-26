@@ -35,3 +35,11 @@ def update_korea():
 @shared_task 
 def update_kcar(): 
     parse_kcar()
+
+
+@shared_task
+def update_encar():
+    from .auc_parsers_2 import fetch_catalog_car
+
+    fetch_catalog_car()
+
