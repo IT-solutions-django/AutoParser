@@ -83,35 +83,34 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
         tof = get_tof(price_rus)
 
         age = datetime.now().year - year
-        if age <= 3:
-            if volume >= 3500:
-                yts = 2285200
-            elif (volume >= 3000) and (volume <= 3499):
-                yts = 1794600
-            else:
-                yts = 3400
+        if age < 3:
+            # if volume >= 3500:
+            #     yts = 2285200
+            # elif (volume >= 3000) and (volume <= 3499):
+            #     yts = 1794600
+            # else:
+            #     yts = 3400
 
             evroprice = price_rus / currency["EUR"]
             if engine_type == 2:
                 duty = evroprice * 0.15
-                yts = 20000 * 0.17
-            elif evroprice < 8500:
+            elif evroprice <= 8500:
                 duty = evroprice * 0.54
                 if duty / volume < 2.5:
                     duty = volume * 2.5
-            elif (evroprice >= 8500) and (evroprice < 16700):
+            elif (evroprice > 8500) and (evroprice <= 16700):
                 duty = evroprice * 0.48
                 if duty / volume < 3.5:
                     duty = volume * 3.5
-            elif (evroprice >= 16700) and (evroprice < 42300):
+            elif (evroprice > 16700) and (evroprice <= 42300):
                 duty = evroprice * 0.48
                 if duty / volume < 5.5:
                     duty = volume * 5.5
-            elif (evroprice >= 42300) and (evroprice < 84500):
+            elif (evroprice > 42300) and (evroprice <= 84500):
                 duty = evroprice * 0.48
                 if duty / volume < 7.5:
                     duty = volume * 7.5
-            elif (evroprice >= 84500) and (evroprice < 169000):
+            elif (evroprice > 84500) and (evroprice <= 169000):
                 duty = evroprice * 0.48
                 if duty / volume < 15:
                     duty = volume * 15
@@ -120,18 +119,17 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
                 if duty / volume < 20:
                     duty = volume * 20
 
-        elif (age > 3) and (age <= 5):
-            if volume >= 3500:
-                yts = 3004000
-            elif (volume >= 3000) and (volume <= 3499):
-                yts = 2747200
-            else:
-                yts = 5200
+        elif (age >= 3) and (age <= 5):
+            # if volume >= 3500:
+            #     yts = 3004000
+            # elif (volume >= 3000) and (volume <= 3499):
+            #     yts = 2747200
+            # else:
+            #     yts = 5200
 
             evroprice = price_rus / currency["EUR"]
             if engine_type == 2:
                 duty = evroprice * 0.15
-                yts = 20000 * 0.26
             elif volume <= 1000:
                 duty = volume * 1.5
             elif (volume >= 1001) and (volume <= 1500):
@@ -145,17 +143,16 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
             else:
                 duty = volume * 3.6
         elif age > 5:
-            if volume >= 3500:
-                yts = 3004000
-            elif (volume >= 3000) and (volume <= 3499):
-                yts = 2747200
-            else:
-                yts = 5200
+            # if volume >= 3500:
+            #     yts = 3004000
+            # elif (volume >= 3000) and (volume <= 3499):
+            #     yts = 2747200
+            # else:
+            #     yts = 5200
 
             evroprice = price_rus / currency["EUR"]
             if engine_type == 2:
                 duty = evroprice * 0.15
-                yts = 20000 * 0.26
             elif volume <= 1000:
                 duty = volume * 3
             elif (volume >= 1001) and (volume <= 1500):
@@ -173,6 +170,33 @@ def calc_price(price: int, year: int, volume: int, table: str, engine_type: str 
             toll = price_rus * 0.15
         else:
             toll = duty * currency["EUR"]
+
+        if age <= 3:
+            if engine_type == 2:
+                yts = 20000 * 0.17
+            elif volume <= 1000:
+                yts = 20000 * 0.17
+            elif (volume >= 1001) and (volume <= 2000):
+                yts = 20000 * 0.17
+            elif (volume >= 2001) and (volume <= 3000):
+                yts = 20000 * 0.17
+            elif (volume >= 3001) and (volume <= 3500):
+                yts = 20000 * 107.67
+            else:
+                yts = 20000 * 137.11
+        else:
+            if engine_type == 2:
+                yts = 20000 * 0.26
+            elif volume <= 1000:
+                yts = 20000 * 0.26
+            elif (volume >= 1001) and (volume <= 2000):
+                yts = 20000 * 0.26
+            elif (volume >= 2001) and (volume <= 3000):
+                yts = 20000 * 0.26
+            elif (volume >= 3001) and (volume <= 3500):
+                yts = 20000 * 165.84
+            else:
+                yts = 20000 * 180.24
 
         res_rus = toll + (delivery * one_rub) + our_commision + broker + insurance_rus + tof + yts
 
