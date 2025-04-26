@@ -322,12 +322,6 @@ def get_popular_cars(brand):
 
 
 def get_detailed_calculation(finish, year, eng_v, table, engine):
-    url = 'http://31.130.151.223/api/calculator/'
-
-    params = {
-        'country': 'Корея',
-    }
-
     try:
 
         if engine and engine in ['전기']:
@@ -336,68 +330,14 @@ def get_detailed_calculation(finish, year, eng_v, table, engine):
         elif engine and engine in ['LPG+가솔린', '디젤+전기', '수소', '가솔린+전기', 'LPG+전기', 'LPG', '가솔린+LPG', '수소+전기', '기타', '가솔린/LPG겸용',
                               '가솔린 하이브리드', '디젤 하이브리드']:
             if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
-                params['price'] = int(finish) * 10000
-
-                year = int(year)
-                current_year = datetime.now().year
-
-                if current_year - year < 3:
-                    params['age'] = 'меньше 3-х лет'
-                elif 3 <= (current_year - year) <= 5:
-                    params['age'] = '3-5 лет'
-                elif 5 < (current_year - year) <= 7:
-                    params['age'] = '5-7 лет'
-                else:
-                    params['age'] = 'больше 7 лет'
-
-                params['volume'] = int(eng_v)
-
-                params['power'] = 1
-
-                params['eng_type'] = 'Бензиновый и электрический'
-
-                params['user_type'] = 'Физическое лицо'
-
-                response = requests.get(url, params=params)
-
-                if response.status_code == 200:
-                    detailed_calculation = response.json().get('detailed_calculation', {})
-                else:
-                    detailed_calculation = {}
+                detailed_calculation = calc_price(int(finish) * 10000, int(year), int(eng_v), table, 3)
 
             else:
                 detailed_calculation = {}
 
         elif engine:
             if finish not in [0, '0'] and finish != 'Не определено' and year and year != 0 and eng_v and eng_v != 'Не определено' and eng_v not in [0, '0']:
-                params['price'] = int(finish) * 10000
-
-                year = int(year)
-                current_year = datetime.now().year
-
-                if current_year - year < 3:
-                    params['age'] = 'меньше 3-х лет'
-                elif 3 <= (current_year - year) <= 5:
-                    params['age'] = '3-5 лет'
-                elif 5 < (current_year - year) <= 7:
-                    params['age'] = '5-7 лет'
-                else:
-                    params['age'] = 'больше 7 лет'
-
-                params['volume'] = int(eng_v)
-
-                params['power'] = 1
-
-                params['eng_type'] = 'Бензиновый'
-
-                params['user_type'] = 'Физическое лицо'
-
-                response = requests.get(url, params=params)
-
-                if response.status_code == 200:
-                    detailed_calculation = response.json().get('detailed_calculation', {})
-                else:
-                    detailed_calculation = {}
+                detailed_calculation = calc_price(int(finish) * 10000, int(year), int(eng_v), table)
             else:
                 detailed_calculation = {}
 
