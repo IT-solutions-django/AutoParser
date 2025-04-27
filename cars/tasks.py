@@ -38,8 +38,8 @@ def update_kcar():
 
 
 @shared_task
-def update_encar():
+def update_encar(user_ip=None):
     from .auc_parsers_2 import fetch_catalog_car
 
-    fetch_catalog_car()
+    fetch_catalog_car(user_ip=user_ip)
 

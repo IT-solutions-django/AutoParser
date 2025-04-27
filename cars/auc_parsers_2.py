@@ -5,12 +5,12 @@ import time
 from random import randint
 
 
-def fetch_card_car(api_id, drive, rate):
+def fetch_card_car(api_id, drive, rate, user_ip=None):
     try:
         url = f'http://31.130.151.223/api/get-auc-tables-data/korea/{api_id}'
 
         params = {
-            'ip': '193.164.149.51'
+            'ip': user_ip
         }
 
         response = requests.get(url, params=params)
@@ -47,7 +47,7 @@ def fetch_card_car(api_id, drive, rate):
         logging.error(f'Не удалось сохранить авто. Ошибка: {e}')
 
 
-def fetch_catalog_car():
+def fetch_catalog_car(user_ip=None):
     page = 1
 
     while True:
@@ -69,7 +69,7 @@ def fetch_catalog_car():
                         drive = car.get('drive', '')
                         rate = car.get('rate', '')
 
-                        fetch_card_car(api_id, drive, rate)
+                        fetch_card_car(api_id, drive, rate, user_ip=user_ip)
 
                     page += 1
 
