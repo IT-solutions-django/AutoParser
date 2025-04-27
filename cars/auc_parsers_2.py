@@ -5,7 +5,7 @@ import time
 from random import randint
 
 
-def fetch_card_car(api_id, drive, rate, user_ip=None):
+def fetch_card_car(api_id, drive, rate, photo, user_ip=None):
     try:
         url = f'http://31.130.151.223/api/get-auc-tables-data/korea/{api_id}'
 
@@ -41,6 +41,11 @@ def fetch_card_car(api_id, drive, rate, user_ip=None):
                         'brand_country': country
                     }
                 )
+
+                if photo:
+                    photo_obj, _ = AucCarsPhoto.objects.get_or_create(url=photo)
+                    car_obj.photos.clear()
+                    car_obj.photos.add(photo_obj)
         else:
             logging.error(f'Ошибка при запросе к карточке авто. Статус ответа: {response.status_code}')
     except Exception as e:
@@ -68,8 +73,9 @@ def fetch_catalog_car(user_ip=None):
                         api_id = car.get('api_id', '')
                         drive = car.get('drive', '')
                         rate = car.get('rate', '')
+                        photo = car.get('first_photo_url', '')
 
-                        fetch_card_car(api_id, drive, rate, user_ip=user_ip)
+                        fetch_card_car(api_id, drive, rate, photo, user_ip=user_ip)
 
                     page += 1
 
