@@ -22,10 +22,10 @@ def fetch_card_car(api_id, drive, rate, photo, user_ip=None):
                 country = CountryModels.objects.filter(brand=car.get('brand', '')).first()
 
                 if car.get('engine', '') and car.get('engine', '') in ['Электро']:
-                    if car.get('finish', '') not in [0, '0'] and car.get('year', 0) and car.get('year', 0) != 0 and car.get('engine_volume', '') and car.get('engine_volume', '') not in [0, '0']:
+                    if car.get('finish', '') not in [0, '0'] and car.get('year', 0) and car.get('year', 0) != 0 and car.get('engine_volume', '') and car.get('engine_volume', '') not in [0, '0'] and car.get('power_volume', '') and car.get('power_volume', '') not in [0, '0']:
                         detailed_calculation = calc_price(int(car.get('finish', '')), int(car.get('year', 0)), int(car.get('engine_volume', '')), 'korea', 2)
 
-                        akz = get_akz(1, int(car.get('year', 0)))
+                        akz = get_akz(int(car.get('power_volume', '')), int(car.get('engine_volume', '')))
                         nds = (detailed_calculation["car_price_rus"] + detailed_calculation["toll"] + akz) * 0.2
 
                         detailed_calculation["total"] = detailed_calculation["total"] + akz + nds
@@ -73,7 +73,9 @@ def fetch_card_car(api_id, drive, rate, photo, user_ip=None):
                         'engine': car.get('engine', ''),
                         'is_active': True,
                         'auction': 'encar',
-                        'brand_country': country
+                        'brand_country': country,
+                        'power_volume': car.get('power_volume', ''),
+                        'grade': car.get('grade', '')
                     }
                 )
 
