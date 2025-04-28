@@ -458,6 +458,7 @@ def get_car(request):
             "rate": car_db.rate,
             "body_brand": car_db.body_brand,
             "api_id": car_db.api_id,
+            "lot": car_db.lot,
             "photos": list(car_db.photos.values_list("url", flat=True))
         }
 
