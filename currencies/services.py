@@ -149,19 +149,36 @@ def get_cny_rate() -> float:
 
 def get_krw_rate() -> float: 
     krw_url = ST.KRW_URL 
-    today = datetime.today().strftime("%d.%m.%Y")
-    params = {
-        'date_from': today, 
-        'date_to': today
-    }
-    response = requests.get(krw_url, params)
-    try:
-        data = response.json()
-        krw_exchange_rate = data['DATA'][0]['UF_SALE']
-        return float(krw_exchange_rate) / 1000
-    except Exception as e:
-        print(f'Ошибка при парсинге KRW: {e}') 
-        return 1
+    today = datetime.today()
+    
+    # Список дат для проверки: сегодня, вчера, позавчера, позапозавчера и неделю назад
+    dates_to_check = [
+        today,
+        today.replace(day=today.day-1),
+        today.replace(day=today.day-2),
+        today.replace(day=today.day-3),
+        today.replace(day=today.day-7)
+    ]
+    
+    for check_date in dates_to_check:
+        date_str = check_date.strftime("%d.%m.%Y")
+        params = {
+            'date_from': date_str,
+            'date_to': date_str
+        }
+        response = requests.get(krw_url, params)
+        try:
+            data = response.json()
+            print(f"Проверка курса на {date_str}:", data)
+            if data.get('DATA'):
+                krw_exchange_rate = data['DATA'][0]['UF_SALE']
+                return float(krw_exchange_rate) / 1000
+        except Exception as e:
+            print(f'Ошибка при проверке курса на {date_str}: {e}')
+            continue
+    
+    print('Не удалось найти курс KRW за последнюю неделю')
+    return 1
     
 
 def get_eur_and_usd_rate() -> tuple[float, float]: 
